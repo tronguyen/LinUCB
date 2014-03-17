@@ -19,14 +19,13 @@ import com.smu.linucb.preprocessing.Dbconnection;
 public class LinUCB extends ALGControl {
 
 	private Dbconnection dbconn;
-	protected Random rBM;
-	protected Random rUSR;
+
 	private SimpleMatrix M;
 	private SimpleMatrix b;
 	private SimpleMatrix theta;
 	private DenseMatrix64F X;
 	private List<Integer> bmLst;
-	private AlgorithmType algType;
+	
 
 	private int user;
 	private double payoff = 0;
@@ -51,12 +50,7 @@ public class LinUCB extends ALGControl {
 		X = new DenseMatrix64F(Environment.featureSize,
 				Environment.numContextVecs);
 		bmLst = new ArrayList<Integer>();
-		this.rUSR = new Random();
-		this.rUSR.setSeed((long) (Math.random() * 10 * System
-				.currentTimeMillis()));
-		this.rBM = new Random();
-		this.rBM.setSeed((long) (Math.random() * 10 * System
-				.currentTimeMillis()));
+		
 		dbconn = Dbconnection._getConn();
 	}
 
@@ -160,23 +154,9 @@ public class LinUCB extends ALGControl {
 		}
 	}
 
-	public void displayResult(int count, double reward) {
-		// TODO Auto-generated method stub
-		int buffSize = 10;
-		if ((count % buffSize) == 0) {
-			// System.out.println("\n\nRound: " + count);
-			// System.out.println("=========" + reward + "============\n\n");
-			Environment.drChart.addData(this.algType, count, reward);
-		}
-	}
+	
 
-	protected AlgorithmType getAlgType() {
-		return algType;
-	}
-
-	protected void setAlgType(AlgorithmType algType) {
-		this.algType = algType;
-	}
+	
 
 	protected double getPayoff() {
 		return this.payoff;

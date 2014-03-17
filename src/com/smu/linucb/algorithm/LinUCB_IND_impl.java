@@ -1,8 +1,9 @@
 package com.smu.linucb.algorithm;
 
-public class LinUCB_IND_impl extends LinUCB_IND {
+public class LinUCB_IND_impl extends LinUCB {
 
 	public LinUCB_IND_impl(int usr) {
+		super();
 		this.setUser(usr);
 		// TODO Auto-generated constructor stub
 	}

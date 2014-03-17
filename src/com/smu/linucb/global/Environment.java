@@ -18,13 +18,18 @@ public class Environment {
 	public static Map<Integer, Double[]> normMatrix = new HashMap<Integer, Double[]>();
 	public static List<Integer> bmidLst = new ArrayList<Integer>();
 	public static Set<Integer> removedBM = new HashSet<Integer>();
-	public static DrawChart drChart = new DrawChart("Bandits Algorithm");
+	public static DrawChart drChart = new DrawChart("Multi-Bandits Algorithm");
 
+	// Config for LinUCB TREE
+	public static int numCluster = 16;
+	public static int numBranch = 4;
+
+	// Config parameters
 	public static int featureSize = 25;
 	public static int numContextVecs = 25;
 	public static double delta = 0.5;
 	public static double alpha = 1 + Math.sqrt(Math.log(2 / delta) / 2);
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 10000;
+	public static int limitTime = 40000;
 }

@@ -8,6 +8,8 @@ package com.smu.alg.view;
  *
  * @author n2t
  */
+import java.awt.Color;
+
 import javax.swing.JFrame;
 
 import org.jfree.chart.ChartFactory;
@@ -75,6 +77,7 @@ public class DrawChart extends JFrame {
 		case LINUCB_TREE:
 			xyLinUCB_TREE = new XYSeries("LINUCB_TREE");
 			dataset.addSeries(xyLinUCB_TREE);
+			break;
 		default:
 			break;
 		}
@@ -85,7 +88,7 @@ public class DrawChart extends JFrame {
 		dataset = new XYSeriesCollection();
 		JFreeChart chart = createChart(dataset);
 		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(600, 400));
+		chartPanel.setPreferredSize(new java.awt.Dimension(700, 400));
 		// this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setContentPane(chartPanel);
 	}
@@ -137,11 +140,12 @@ public class DrawChart extends JFrame {
 		// OPTIONAL CUSTOMISATION COMPLETED.
 
 		final XYPlot plot = chart.getXYPlot();
+		plot.setBackgroundPaint(Color.lightGray);
 		ValueAxis axis = plot.getDomainAxis();
 		axis.setAutoRange(true);
 		// axis.setFixedAutoRange(2000.0);
 		axis = plot.getRangeAxis();
-		axis.setRange(-50.0, 150.0);
+		axis.setRange(-50.0, 250.0);
 		return chart;
 
 	}
