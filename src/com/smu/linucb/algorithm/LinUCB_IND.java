@@ -10,7 +10,7 @@ import com.smu.linucb.global.Environment;
 
 public class LinUCB_IND extends LinUCB {
 
-	public static Map<Integer, LinUCB_IND_impl> banditLst = new HashMap<Integer, LinUCB_IND_impl>();
+	private static Map<Integer, LinUCB_IND_impl> banditLst = new HashMap<Integer, LinUCB_IND_impl>();
 	private static double rewardTotal = 0;
 
 	// public static int time = 0;
@@ -37,7 +37,7 @@ public class LinUCB_IND extends LinUCB {
 	public void run() {
 		int usr;
 		LinUCB_IND_impl r;
-		Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
+		// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
 		for (int i = 1; i < Environment.limitTime; i++) {
 			// Pick user randomly
 			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst

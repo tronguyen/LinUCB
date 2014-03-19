@@ -19,6 +19,7 @@ import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.pca.PrincipleComponentAnalysis;
 import com.smu.linucb.preprocessing.Dbconnection;
 import com.smu.linucb.preprocessing.Preprocessing;
+import com.smu.linucb.verification.TreeFixedCluster;
 
 public class ALGControl extends Thread {
 
@@ -50,7 +51,7 @@ public class ALGControl extends Thread {
 		return algType;
 	}
 
-	protected void setAlgType(AlgorithmType algType) {
+	public void setAlgType(AlgorithmType algType) {
 		this.algType = algType;
 	}
 
@@ -177,12 +178,23 @@ public class ALGControl extends Thread {
 		switch (type) {
 		case LINUCB_SIN:
 			alg = new LinUCB_SIN();
+			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 			break;
 		case LINUCB_IND:
 			alg = new LinUCB_IND();
+			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
 			break;
 		case LINUCB_TREE:
 			alg = new LinUCB_TREE();
+			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_TREE);
+			break;
+		case LINUCB_VER:
+			alg = new TreeFixedCluster(false);
+			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_VER);
+			break;
+		case LINUCB_WARM:
+			alg = new TreeFixedCluster(true);
+			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_WARM);
 			break;
 		}
 		return alg;
@@ -190,9 +202,6 @@ public class ALGControl extends Thread {
 
 	@Override
 	public void run() {
-	};
-
-	protected void active() {
 	};
 
 	public static void main(String[] args) throws SQLException {
@@ -217,12 +226,19 @@ public class ALGControl extends Thread {
 		alg.start();
 
 		// Running LinIND
-//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
-//		alg.start();
+		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
+		alg.start();
 
 		// Run LinUCBTREE
 		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
 		alg.start();
 
+		// Running verification && Warmstart
+		TreeFixedCluster.doCluster();
+		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
+		alg.start();
+
+		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_WARM);
+		alg.start();
 	}
 }

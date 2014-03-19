@@ -8,6 +8,7 @@ package com.smu.alg.view;
  *
  * @author n2t
  */
+import java.awt.BasicStroke;
 import java.awt.Color;
 
 import javax.swing.JFrame;
@@ -40,6 +41,8 @@ public class DrawChart extends JFrame {
 	XYSeries xyLinUCB_SIN;
 	XYSeries xyLinUCB_IND;
 	XYSeries xyLinUCB_TREE;
+	XYSeries xyLinUCB_VER;
+	XYSeries xyLinUCB_WARM;
 
 	public DrawChart(final String title) {
 		super(title);
@@ -59,6 +62,12 @@ public class DrawChart extends JFrame {
 		case LINUCB_TREE:
 			xyLinUCB_TREE.add(x, y);
 			break;
+		case LINUCB_VER:
+			xyLinUCB_VER.add(x, y);
+			break;
+		case LINUCB_WARM:
+			xyLinUCB_WARM.add(x, y);
+			break;
 		default:
 			break;
 		}
@@ -77,6 +86,14 @@ public class DrawChart extends JFrame {
 		case LINUCB_TREE:
 			xyLinUCB_TREE = new XYSeries("LINUCB_TREE");
 			dataset.addSeries(xyLinUCB_TREE);
+			break;
+		case LINUCB_VER:
+			xyLinUCB_VER = new XYSeries("LINUCB_VER");
+			dataset.addSeries(xyLinUCB_VER);
+			break;
+		case LINUCB_WARM:
+			xyLinUCB_WARM = new XYSeries("LINUCB_WARM");
+			dataset.addSeries(xyLinUCB_WARM);
 			break;
 		default:
 			break;
@@ -141,6 +158,8 @@ public class DrawChart extends JFrame {
 
 		final XYPlot plot = chart.getXYPlot();
 		plot.setBackgroundPaint(Color.lightGray);
+		// plot.getRenderer().setBaseStroke(new BasicStroke(3));
+		plot.getRenderer().setStroke(new BasicStroke(2));
 		ValueAxis axis = plot.getDomainAxis();
 		axis.setAutoRange(true);
 		// axis.setFixedAutoRange(2000.0);

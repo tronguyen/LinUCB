@@ -8,7 +8,7 @@ import com.smu.linucb.global.Environment;
 public class LinUCB_SIN extends LinUCB {
 
 	// public static int time = 0;
-	public static double rewardTotal = 0;
+	private static double rewardTotal = 0;
 
 	public LinUCB_SIN() {
 		// TODO Auto-generated constructor stub
@@ -17,7 +17,7 @@ public class LinUCB_SIN extends LinUCB {
 
 	@Override
 	public void run() {
-		Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
+//		Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 		// TODO Auto-generated method stub
 		for (int i = 1; i < Environment.limitTime; i++) {
 			// Pick user randomly

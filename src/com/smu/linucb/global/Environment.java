@@ -19,9 +19,10 @@ public class Environment {
 	public static List<Integer> bmidLst = new ArrayList<Integer>();
 	public static Set<Integer> removedBM = new HashSet<Integer>();
 	public static DrawChart drChart = new DrawChart("Multi-Bandits Algorithm");
+	public static Map<Integer, Integer> usrClusterMap = new HashMap<Integer, Integer>();
 
 	// Config for LinUCB TREE
-	public static int numCluster = 16;
+	public static int numCluster = 64;
 	public static int numBranch = 4;
 
 	// Config parameters
@@ -31,5 +32,5 @@ public class Environment {
 	public static double alpha = 1 + Math.sqrt(Math.log(2 / delta) / 2);
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 40000;
+	public static int limitTime = 10000;
 }

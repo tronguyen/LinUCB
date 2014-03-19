@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.smu.control.ALGControl;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 
 public class LinUCB_TREE extends UCB1 {
-	private static double rewardTotal = 0;
-	public static UCB1 rootTree;
-	public static List<UCB1> leavesTree = new ArrayList<UCB1>();
-	public static List<Integer> fstTimeUsrLst = new ArrayList<Integer>();
-	public static Random rClus = new Random();
+	private double rewardTotal = 0;
+	private UCB1 rootTree;
+	private List<UCB1> leavesTree = new ArrayList<UCB1>();
+	private List<Integer> fstTimeUsrLst = new ArrayList<Integer>();
+	private Random rClus = new Random();
+	private boolean fixedCluster = false;
+	private boolean isWarmStart = false;
 
 	public LinUCB_TREE() {
 		this.setAlgType(AlgorithmType.LINUCB_TREE);
@@ -21,11 +22,11 @@ public class LinUCB_TREE extends UCB1 {
 	}
 
 	// Build empty tree
-	public static void buildTree(UCB1 pRoot, int maxLv) {
+	public void buildTree(UCB1 pRoot, int maxLv) {
 		if (maxLv == 0) {
 			// Create LinUCB node
 			pRoot.linucb = new LinUCB();
-			LinUCB_TREE.leavesTree.add(pRoot);
+			this.leavesTree.add(pRoot);
 			return;
 		}
 		UCB1 pNext = null;
@@ -55,34 +56,41 @@ public class LinUCB_TREE extends UCB1 {
 	@Override
 	public void run() {
 		int usr;
-		LinUCB_TREE.rootTree = new UCB1();
+		this.rootTree = new UCB1();
 		UCB1 cur = null;
 		LinUCB cluster = null;
-		LinUCB_TREE.buildTree(LinUCB_TREE.rootTree,
+		buildTree(this.rootTree,
 				(int) Math.ceil((Math.log(Environment.numCluster) / Math
 						.log(Environment.numBranch))));
 
-		Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_TREE);
 		for (int i = 1; i < Environment.limitTime; i++) {
 			// Pick user randomly
 			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
 					.size()));
-
-			if (LinUCB_TREE.fstTimeUsrLst.contains(usr)) {
-				/*
-				 * Run UCB1. Find the cluster the user to which belongs
-				 */
-				cur = LinUCB_TREE.rootTree;
-				while (cur.childLst.size() != 0) {
-					cur = UCB1.impl(usr, cur);
+			if (!this.isFixedCluster()) {
+				if (this.fstTimeUsrLst.contains(usr)) {
+					/*
+					 * Run UCB1. Find the cluster the user to which belongs
+					 */
+					cur = this.rootTree;
+					while (cur.childLst.size() != 0) {
+						cur = UCB1.impl(usr, cur);
+					}
+				} else {
+					this.fstTimeUsrLst.add(usr);
+					// Select randomly cluster for user having the first time
+					// falling
+					// down
+					if (!this.isWarmStart()) {
+						cur = this.leavesTree.get(this.rClus
+								.nextInt(Environment.numCluster));
+					} else {
+						cur = this.leavesTree.get(Environment.usrClusterMap
+								.get(usr));
+					}
 				}
 			} else {
-				LinUCB_TREE.fstTimeUsrLst.add(usr);
-				// Select randomly cluster for user having the first time
-				// falling
-				// down
-				cur = LinUCB_TREE.leavesTree.get(LinUCB_TREE.rClus
-						.nextInt(Environment.numCluster));
+				cur = this.leavesTree.get(Environment.usrClusterMap.get(usr));
 			}
 
 			// Run LinUCB for the cluster
@@ -94,10 +102,26 @@ public class LinUCB_TREE extends UCB1 {
 			// Update weight for the path
 			LinUCB_TREE.backPropagation(cur, cluster.getPayoff(), usr);
 
-			LinUCB_TREE.rewardTotal += cluster.getPayoff();
+			this.rewardTotal += cluster.getPayoff();
 			// Draw chart
-			this.displayResult(i, LinUCB_TREE.rewardTotal);
+			this.displayResult(i, this.rewardTotal);
 		}
 		this.interrupt();
+	}
+
+	public boolean isFixedCluster() {
+		return fixedCluster;
+	}
+
+	public void setFixedCluster(boolean fixedCluster) {
+		this.fixedCluster = fixedCluster;
+	}
+
+	public boolean isWarmStart() {
+		return isWarmStart;
+	}
+
+	public void setWarmStart(boolean isWarmStart) {
+		this.isWarmStart = isWarmStart;
 	}
 }

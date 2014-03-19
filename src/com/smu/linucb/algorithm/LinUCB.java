@@ -154,12 +154,7 @@ public class LinUCB extends ALGControl {
 		}
 	}
 
-	
-
-	
-
 	protected double getPayoff() {
 		return this.payoff;
 	}
-
 }
