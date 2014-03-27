@@ -222,21 +222,21 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
-		alg.start();
+//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
+//		alg.start();
 
 		// Running LinIND
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
-		alg.start();
+//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
+//		alg.start();
 
 		// Run LinUCBTREE
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
-		alg.start();
+//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
+//		alg.start();
 
 		// Running verification && Warmstart
 		TreeFixedCluster.doCluster();
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
-		alg.start();
+//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
+//		alg.start();
 
 		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_WARM);
 		alg.start();

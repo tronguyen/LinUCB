@@ -114,7 +114,7 @@ public class LinUCB extends ALGControl {
 			CommonOps.extractDiag(temp2, diag);
 			// Get square root of diag vector
 			for (int sq = 0; sq < Environment.numContextVecs; sq++) {
-				double sqVal = Environment.alpha * Math.sqrt(diag.get(sq));
+				double sqVal = Environment.alphaLin * Math.sqrt(diag.get(sq));
 				diag.set(sq, sqVal);
 			}
 
