@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.smu.control.ALGControl;
+import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.global.Environment;
 
 class UserItem {
@@ -34,7 +35,7 @@ class UserItem {
 	}
 }
 
-public class UCB1 extends ALGControl {
+public class UCB1 {
 	public List<UCB1> childLst = new ArrayList<UCB1>();
 	public Map<Integer, UserItem> payoffMap; // Key: user, Value: payoff for
 												// each
@@ -42,6 +43,7 @@ public class UCB1 extends ALGControl {
 	public UCB1 pNode = null; // parent node
 	public UCB1 cNode = null; // child node
 	public LinUCB linucb = null;
+	private int indexLeaf;
 
 	public UCB1(UCB1 pNode) {
 		this.pNode = pNode;
@@ -68,7 +70,7 @@ public class UCB1 extends ALGControl {
 			}
 			val = usrItem.getPayoff()
 					/ (usrItem.getVisit() + 1)
-					+ Environment.alpha
+					+ Environment.alphaUCB
 					* Math.sqrt(2
 							* Math.log(pNode.payoffMap.get(usr).getVisit() + 1)
 							/ (usrItem.getVisit() + 1));
@@ -78,5 +80,13 @@ public class UCB1 extends ALGControl {
 			}
 		}
 		return selectedNode;
+	}
+
+	public int getIndexLeaf() {
+		return indexLeaf;
+	}
+
+	public void setIndexLeaf(int indexLeaf) {
+		this.indexLeaf = indexLeaf;
 	}
 }

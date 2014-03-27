@@ -19,18 +19,29 @@ public class Environment {
 	public static List<Integer> bmidLst = new ArrayList<Integer>();
 	public static Set<Integer> removedBM = new HashSet<Integer>();
 	public static DrawChart drChart = new DrawChart("Multi-Bandits Algorithm");
+
+	// 4 Clustering by K-Mean
 	public static Map<Integer, Integer> usrClusterMap = new HashMap<Integer, Integer>();
+	public static Map<Integer, List<Integer>> clusterMap = new HashMap<Integer, List<Integer>>();
+	// public static Map<Integer, List<Integer>> clusterExtraMap = new
+	// HashMap<Integer, List<Integer>>();
 
 	// Config for LinUCB TREE
-	public static int numCluster = 64;
-	public static int numBranch = 4;
+	public static int numCluster = 16;
+	public static int numBranch = 16;
+
+	// Configure for warm-start
+	public static int numWarmIter = 2000;
 
 	// Config parameters
 	public static int featureSize = 25;
 	public static int numContextVecs = 25;
 	public static double delta = 0.5;
-	public static double alpha = 1 + Math.sqrt(Math.log(2 / delta) / 2);
+	public static double alphaLin = 1 + Math.sqrt(Math.log(2 / delta) / 2);
+	public static double alphaUCB = 0.01;
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 10000;
+	public static int numAvgLoop = 5;
+	public static int buffSizeDisplay = 10;
 }

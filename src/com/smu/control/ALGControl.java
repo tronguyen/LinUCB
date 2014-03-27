@@ -6,13 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Random;
 
 import org.jfree.ui.RefineryUtilities;
 
-import com.smu.linucb.algorithm.LinUCB_IND;
-import com.smu.linucb.algorithm.LinUCB_SIN;
-import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalSQLQuery;
@@ -24,37 +20,6 @@ import com.smu.linucb.verification.TreeFixedCluster;
 public class ALGControl extends Thread {
 
 	static File fMatrix = new File("norm_matrix_ejml_full");
-	protected Random rBM;
-	protected Random rUSR;
-	private AlgorithmType algType;
-
-	public ALGControl() {
-		this.rUSR = new Random(System.nanoTime()
-				* Thread.currentThread().getId());
-		// this.rUSR.setSeed((long) (this.rUSR.nextInt() * Math.random() * 10));
-		this.rBM = new Random(System.nanoTime()
-				* Thread.currentThread().getId());
-		// this.rBM.setSeed((long) (this.rBM.nextInt() * Math.random() * 10));
-	}
-
-	public void displayResult(int count, double reward) {
-		// TODO Auto-generated method stub
-		int buffSize = 10;
-		if ((count % buffSize) == 0) {
-			// System.out.println("\n\nRound: " + count);
-			// System.out.println("=========" + reward + "============\n\n");
-			Environment.drChart.addData(this.algType, count, reward);
-		}
-	}
-
-	protected AlgorithmType getAlgType() {
-		return algType;
-	}
-
-	public void setAlgType(AlgorithmType algType) {
-		this.algType = algType;
-	}
-
 	/**
 	 * @param args
 	 */
@@ -173,36 +138,13 @@ public class ALGControl extends Thread {
 		pr.writeNormMatrix(pca, mxIN, mxOUT);
 	}
 
-	public static ALGControl factoryInstanceAlg(AlgorithmType type) {
-		ALGControl alg = null;
-		switch (type) {
-		case LINUCB_SIN:
-			alg = new LinUCB_SIN();
-			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
-			break;
-		case LINUCB_IND:
-			alg = new LinUCB_IND();
-			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
-			break;
-		case LINUCB_TREE:
-			alg = new LinUCB_TREE();
-			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_TREE);
-			break;
-		case LINUCB_VER:
-			alg = new TreeFixedCluster(false);
-			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_VER);
-			break;
-		case LINUCB_WARM:
-			alg = new TreeFixedCluster(true);
-			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_WARM);
-			break;
-		}
-		return alg;
-	}
+	
 
 	@Override
 	public void run() {
 	};
+
+	
 
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
@@ -222,23 +164,23 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
-		alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
+		// alg.start();
 
 		// Running LinIND
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
-		alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
+		// alg.start();
 
 		// Run LinUCBTREE
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
-		alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
+		// alg.start();
 
 		// Running verification && Warmstart
 		TreeFixedCluster.doCluster();
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
-		alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
+		// alg.start();
 
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_WARM);
+		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
 		alg.start();
 	}
 }
