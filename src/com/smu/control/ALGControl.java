@@ -169,15 +169,15 @@ public class ALGControl extends Thread {
 		// alg.start();
 
 		// Run LinUCBTREE
-		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
-		// alg.start();
+		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
+		 alg.start();
 
 		// Running verification && Warmstart
 		TreeFixedCluster.doCluster();
 		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
 		// alg.start();
 
-		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
-		alg.start();
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
+		// alg.start();
 	}
 }
