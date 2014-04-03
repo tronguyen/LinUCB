@@ -113,7 +113,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 			alg.start();
 		}
 		int time;
-		double rewardDisplay;
+		double rewardDisplay = 0;
 		while (true) {
 			if (this.getRewardIndex().size() != 0) {
 				time = this.getRewardIndex().get(0);
@@ -125,7 +125,9 @@ public class AlgorithmThreadBuilder extends ALGControl {
 				}
 				this.getRewardIndex().remove(0);
 				if (time == Environment.limitTime) {
+					System.out.println("Reward: " + rewardDisplay);
 					this.interrupt();
+					return;
 				}
 			}
 			try {

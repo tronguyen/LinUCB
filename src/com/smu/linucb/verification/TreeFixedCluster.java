@@ -115,14 +115,15 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 		// Map<Integer, List<Integer>> rmMap = new HashMap<Integer,
 		// List<Integer>>();
 		Random r = new Random();
-		int lenClus = 0;
+		int lenClus = 0, lenRun = 0;
 		int chosenUsr, chosenUsrIndex, chosenCls, clsIndex;
 		for (int cls : clusterLst) {
-			lenClus = Environment.clusterMap.get(cls).size();
+			lenClus = (int) (Environment.clusterMap.get(cls).size() * Environment.percentExchange);
+			lenRun = lenClus;
 			// pick random 5% items
-			for (int k = 0; k < (int) (Environment.percentExchange * lenClus); k++) {
+			for (int k = 0; k < lenClus; k++) {
 				// pick randomly one user in cluster
-				chosenUsrIndex = r.nextInt(lenClus--);
+				chosenUsrIndex = r.nextInt(lenRun--);
 				chosenUsr = Environment.clusterMap.get(cls).get(chosenUsrIndex);
 				// pick randomly cluster to push the user in
 				clsIndex = r.nextInt(clusterLst.size());
