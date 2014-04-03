@@ -105,7 +105,7 @@ public class DrawChart extends JFrame {
 		dataset = new XYSeriesCollection();
 		JFreeChart chart = createChart(dataset);
 		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(800, 400));
+		chartPanel.setPreferredSize(new java.awt.Dimension(600, 400));
 		// this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setContentPane(chartPanel);
 	}
@@ -164,7 +164,8 @@ public class DrawChart extends JFrame {
 		axis.setAutoRange(true);
 		// axis.setFixedAutoRange(2000.0);
 		axis = plot.getRangeAxis();
-		axis.setRange(-50.0, 250.0);
+		// axis.setRange(-50.0, 250.0);
+		axis.setRange(0.0, 2000.0);
 		return chart;
 
 	}

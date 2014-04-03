@@ -20,6 +20,7 @@ import com.smu.linucb.verification.TreeFixedCluster;
 public class ALGControl extends Thread {
 
 	static File fMatrix = new File("norm_matrix_ejml_full");
+
 	/**
 	 * @param args
 	 */
@@ -138,13 +139,9 @@ public class ALGControl extends Thread {
 		pr.writeNormMatrix(pca, mxIN, mxOUT);
 	}
 
-	
-
 	@Override
 	public void run() {
 	};
-
-	
 
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
@@ -164,7 +161,7 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
 		// alg.start();
 
 		// Running LinIND
@@ -172,12 +169,12 @@ public class ALGControl extends Thread {
 		// alg.start();
 
 		// Run LinUCBTREE
-		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
 		// alg.start();
 
 		// Running verification && Warmstart
 		TreeFixedCluster.doCluster();
-		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
 		// alg.start();
 
 		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);

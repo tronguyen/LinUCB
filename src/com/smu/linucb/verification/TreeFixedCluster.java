@@ -90,7 +90,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 			}
 
 			// Make noise original data
-			// genSyntheticData();
+			genSyntheticData();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -114,17 +114,16 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 				Environment.clusterMap.keySet());
 		// Map<Integer, List<Integer>> rmMap = new HashMap<Integer,
 		// List<Integer>>();
-		double percentExchange = 0.05; // 5%
 		Random r = new Random();
 		int lenClus = 0;
-		int chosenUsr, chosenCls, clsIndex;
+		int chosenUsr, chosenUsrIndex, chosenCls, clsIndex;
 		for (int cls : clusterLst) {
 			lenClus = Environment.clusterMap.get(cls).size();
 			// pick random 5% items
-			for (int k = 0; k < (int) (percentExchange * lenClus); k++) {
+			for (int k = 0; k < (int) (Environment.percentExchange * lenClus); k++) {
 				// pick randomly one user in cluster
-				chosenUsr = Environment.clusterMap.get(cls).get(
-						r.nextInt(lenClus));
+				chosenUsrIndex = r.nextInt(lenClus--);
+				chosenUsr = Environment.clusterMap.get(cls).get(chosenUsrIndex);
 				// pick randomly cluster to push the user in
 				clsIndex = r.nextInt(clusterLst.size());
 				chosenCls = clusterLst.get(clsIndex);
@@ -132,11 +131,15 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 					chosenCls = clusterLst.get((clsIndex + 1)
 							% clusterLst.size());
 				}
+				// Check 5%: Keep track of original status of user
+				addSpecMap(Environment.errUsrClsLst, cls, chosenUsr);
+				Environment.errUsrSet.add(chosenUsr);
+				Environment.clusterMap.get(cls).remove(chosenUsrIndex);
 				// addSpecMap(Environment.clusterExtraMap, chosenCls,
 				// chosenUsr);
 				// addSpecMap(rmMap, cls, chosenUsr);
 
-				// Update user-cluster Map
+				// Change user-cluster Map
 				Environment.usrClusterMap.put(chosenUsr, chosenCls);
 			}
 		}
@@ -156,6 +159,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 			alg.setAlgType(AlgorithmType.LINUCB_WARM);
 		}
 		alg.start();
+		this.interrupt();
 	}
 
 	public static SimpleKMeans getKmean() {

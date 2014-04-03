@@ -11,7 +11,7 @@ import com.smu.linucb.global.Environment;
 public class LinUCB_IND extends LinUCB {
 
 	private static Map<Integer, LinUCB_IND_impl> banditLst = new HashMap<Integer, LinUCB_IND_impl>();
-	private static double rewardTotal = 0;
+	private double rewardTotal = 0;
 
 	// public static int time = 0;
 
@@ -45,9 +45,9 @@ public class LinUCB_IND extends LinUCB {
 			// System.out.println("User: " + usr);
 			r = LinUCB_IND.getUserBandit(usr);
 			r.run_nonthread();
-			LinUCB_IND.rewardTotal += r.getPayoff();
+			this.rewardTotal += r.getPayoff();
 			// Draw chart
-			this.displayResult(i, LinUCB_IND.rewardTotal);
+			this.displayResult(i, this.rewardTotal);
 		}
 		this.interrupt();
 	}

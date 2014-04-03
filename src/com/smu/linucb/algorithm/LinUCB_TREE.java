@@ -12,7 +12,6 @@ import java.util.Set;
 
 import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
-import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.verification.TreeFixedCluster;
 
@@ -20,7 +19,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private double rewardTotal = 0;
 	private UCB1 rootTree;
 	private List<UCB1> leavesTree = new ArrayList<UCB1>();
-	private List<Integer> fstTimeUsrLst = new ArrayList<Integer>();
+	private Set<Integer> fstTimeUsrLst = new HashSet<Integer>();
 	private Random rClus = new Random();
 	private boolean fixedCluster = false; // fix clusters permanently &
 											// temporarily
@@ -28,10 +27,11 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private int warmIter;
 	private int indexLeaf = 0;
 	private Map<Integer, Integer> userLeafMap = new HashMap<Integer, Integer>();
+	private int hitBranch = 0;
 
 	public LinUCB_TREE() {
-//		super(AlgorithmType.LINUCB_TREE);
-//		this.setAlgType(AlgorithmType.LINUCB_TREE);
+		// super(AlgorithmType.LINUCB_TREE);
+		// this.setAlgType(AlgorithmType.LINUCB_TREE);
 		this.rClus.setSeed(System.nanoTime() * Thread.currentThread().getId());
 	}
 
@@ -85,7 +85,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 					.size()));
 			if (!this.isFixedCluster()) {
 				if (this.fstTimeUsrLst.contains(usr)
-						&& (!this.isWarmStart || (this.isWarmStart && this.warmIter > Environment.numWarmIter))) {
+						&& (!this.isWarmStart || (this.isWarmStart
+								&& Environment.errUsrSet.contains(usr) && this.warmIter > Environment.numWarmIter))) {
 					/*
 					 * Run UCB1. Find the cluster the user to which belongs
 					 */
@@ -93,6 +94,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 					while (cur.childLst.size() != 0) {
 						cur = UCB1.impl(usr, cur);
 					}
+					// Increase num of hits (users err-switched)
+					this.hitBranch++;
 				} else {
 					// Select randomly cluster for user having the first time
 					// falling
@@ -111,7 +114,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 				cur = this.leavesTree.get(Environment.usrClusterMap.get(usr));
 			}
 			// Put user into leaf
-			// this.userLeafMap.put(usr, cur.getIndexLeaf());
+			this.userLeafMap.put(usr, cur.getIndexLeaf());
 
 			// Run LinUCB for the cluster
 			cluster = cur.linucb;
@@ -130,10 +133,38 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		}
 		// Compare to K-Mean clustering
 		// compare2Kmean();
-
+		compare2Origin();
 		this.interrupt();
 	}
 
+	// Compare only 5% changes (95% fixed class) to original clustering (K-Mean)
+	private void compare2Origin() {
+		List<Integer> usrLst;
+		int cls, right = 0, wrong = 0;
+		for (Iterator<Integer> i = Environment.errUsrClsLst.keySet().iterator(); i
+				.hasNext();) {
+			cls = i.next();
+			usrLst = Environment.errUsrClsLst.get(cls);
+			for (int j = 0; j < usrLst.size(); j++) {
+				// Turn back their right cluster
+				if (this.userLeafMap.get(usrLst.get(j)) == cls) {
+					right++;
+				} else {
+					wrong++;
+				}
+			}
+		}
+		// Print result comparison
+		System.out.println("Right back: " + right);
+		System.out.println("Wrong back: " + wrong);
+		System.out.println("Hit Err-User: " + this.hitBranch);
+		System.out.println("Size error: " + Environment.errUsrSet.size());
+		System.out.println("Compare: " + (double) right / (right + wrong));
+		System.out.println("Hit Rate: " + (double) this.hitBranch
+				/ Environment.errUsrSet.size());
+	}
+
+	// Compare B-cube-measured clustering
 	private void compare2Kmean() {
 		Set<Set<Integer>> referencePartition = new HashSet<Set<Integer>>();
 		Set<Set<Integer>> responsePartition = new HashSet<Set<Integer>>();
