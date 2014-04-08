@@ -2,7 +2,6 @@ package com.smu.linucb.verification;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import weka.clusterers.SimpleKMeans;
@@ -15,6 +14,7 @@ import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalFunction;
 import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.preprocessing.Dbconnection;
 
@@ -86,7 +86,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 				user = Environment.userLst.get(i);
 				cluster = getKmean().clusterInstance(getDataset().instance(i));
 				Environment.usrClusterMap.put(user, cluster);
-				addSpecMap(Environment.clusterMap, cluster, user);
+				GlobalFunction.addSpecMap(Environment.clusterMap, cluster, user);
 			}
 
 			// Make noise original data
@@ -95,17 +95,6 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-
-	public static void addSpecMap(Map<Integer, List<Integer>> objMap, int key,
-			int value) {
-		if (objMap.containsKey(key)) {
-			objMap.get(key).add(value);
-		} else {
-			List<Integer> initLst = new ArrayList<Integer>();
-			initLst.add(value);
-			objMap.put(key, initLst);
 		}
 	}
 

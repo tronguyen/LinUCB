@@ -14,6 +14,7 @@ import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalFunction;
 import com.smu.linucb.verification.TreeFixedCluster;
 
 public class LinUCB_TREE extends AlgorithmThreadBuilder {
@@ -30,8 +31,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private Map<Integer, Integer> userLeafMap = new HashMap<Integer, Integer>();
 
 	public LinUCB_TREE() {
-//		super(AlgorithmType.LINUCB_TREE);
-//		this.setAlgType(AlgorithmType.LINUCB_TREE);
+		// super(AlgorithmType.LINUCB_TREE);
+		// this.setAlgType(AlgorithmType.LINUCB_TREE);
 		this.rClus.setSeed(System.nanoTime() * Thread.currentThread().getId());
 	}
 
@@ -150,8 +151,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		for (Iterator<Integer> i = this.userLeafMap.keySet().iterator(); i
 				.hasNext();) {
 			int usr = i.next();
-			TreeFixedCluster
-					.addSpecMap(tempMap, this.userLeafMap.get(usr), usr);
+			GlobalFunction.addSpecMap(tempMap, this.userLeafMap.get(usr), usr);
 		}
 
 		for (Iterator<Integer> i = tempMap.keySet().iterator(); i.hasNext();) {

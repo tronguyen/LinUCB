@@ -63,6 +63,10 @@ public class ALGControl extends Thread {
 			pr.buildBookmark_Tags(dbconn
 					.getResultSet(GlobalSQLQuery.GETBOOKMARK_TAG));
 
+			// Build User Relations
+			pr.buildContactRelation(new File(
+					"Data/Delicious/user_contacts-timestamps.dat"));
+
 			// Build user list
 			// pr.buildUserList(dbconn.getResultSet(GlobalSQLQuery.GETUSER));
 
@@ -161,23 +165,23 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
-		alg.start();
+//		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
+//		alg.start();
 
 		// Running LinIND
 		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
 		// alg.start();
 
 		// Run LinUCBTREE
-		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
-		 alg.start();
+		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
+		alg.start();
 
 		// Running verification && Warmstart
-		TreeFixedCluster.doCluster();
-		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
-		// alg.start();
+		 TreeFixedCluster.doCluster();
+//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
+//		 alg.start();
 
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
-		// alg.start();
+//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
+//		 alg.start();
 	}
 }
