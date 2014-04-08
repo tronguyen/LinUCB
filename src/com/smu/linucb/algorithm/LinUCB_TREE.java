@@ -79,7 +79,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 				(int) Math.ceil((Math.log(Environment.numCluster) / Math
 						.log(Environment.numBranch))));
 		int index;
-		for (int i = 1; i < Environment.limitTime; i++) {
+		for (int i = 1; i <= Environment.limitTime; i++) {
 			// Pick user randomly
 			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
 					.size()));

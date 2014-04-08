@@ -19,7 +19,7 @@ public class LinUCB_SIN extends LinUCB {
 	public void run() {
 //		Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 		// TODO Auto-generated method stub
-		for (int i = 1; i < Environment.limitTime; i++) {
+		for (int i = 1; i <= Environment.limitTime; i++) {
 			// Pick user randomly
 			this.setUser(Environment.userLst.get(rUSR
 					.nextInt(Environment.userLst.size())));

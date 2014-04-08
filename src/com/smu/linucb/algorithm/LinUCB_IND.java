@@ -38,7 +38,7 @@ public class LinUCB_IND extends LinUCB {
 		int usr;
 		LinUCB_IND_impl r;
 		// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
-		for (int i = 1; i < Environment.limitTime; i++) {
+		for (int i = 1; i <= Environment.limitTime; i++) {
 			// Pick user randomly
 			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
 					.size()));
