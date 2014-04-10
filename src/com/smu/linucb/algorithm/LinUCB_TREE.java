@@ -13,6 +13,7 @@ import java.util.Set;
 import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalFunction;
 import com.smu.linucb.verification.TreeFixedCluster;
 
 public class LinUCB_TREE extends AlgorithmThreadBuilder {
@@ -214,7 +215,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		for (Iterator<Integer> i = this.userLeafMap.keySet().iterator(); i
 				.hasNext();) {
 			int usr = i.next();
-			TreeFixedCluster
+			GlobalFunction
 					.addSpecMap(tempMap, this.userLeafMap.get(usr), usr);
 		}
 
