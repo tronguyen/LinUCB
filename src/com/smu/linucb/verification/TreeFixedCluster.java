@@ -133,7 +133,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 							% clusterLst.size());
 				}
 				// Check 5%: Keep track of original status of user
-				addSpecMap(Environment.errUsrClsLst, cls, chosenUsr);
+				Environment.errUsrClsMap.put(chosenUsr, cls);
 				Environment.errUsrSet.add(chosenUsr);
 				Environment.clusterMap.get(cls).remove(chosenUsrIndex);
 				// addSpecMap(Environment.clusterExtraMap, chosenCls,

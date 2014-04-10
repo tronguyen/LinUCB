@@ -79,6 +79,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 				(int) Math.ceil((Math.log(Environment.numCluster) / Math
 						.log(Environment.numBranch))));
 		int index;
+		List<Integer> itemOrder;
+		int rightBackOrder = 0;
 		for (int i = 1; i <= Environment.limitTime; i++) {
 			// Pick user randomly
 			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
@@ -96,6 +98,26 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 					}
 					// Increase num of hits (users err-switched)
 					this.hitBranch++;
+					if (Environment.usrReturnMap.containsKey(usr)) {
+						rightBackOrder = Environment.usrReturnMap.get(usr).get(
+								0) + 1;
+						Environment.usrReturnMap.get(usr)
+								.set(0, rightBackOrder);
+						if (cur.getIndexLeaf() == Environment.errUsrClsMap
+								.get(usr)) {
+							Environment.usrReturnMap.get(usr).add(
+									rightBackOrder);
+						}
+					} else {
+						itemOrder = new ArrayList<Integer>();
+						itemOrder.add(1);
+						if (cur.getIndexLeaf() == Environment.errUsrClsMap
+								.get(usr)) {
+							itemOrder.add(1);
+						}
+						Environment.usrReturnMap.put(usr, itemOrder);
+
+					}
 				} else {
 					// Select randomly cluster for user having the first time
 					// falling
@@ -139,20 +161,29 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 
 	// Compare only 5% changes (95% fixed class) to original clustering (K-Mean)
 	private void compare2Origin() {
-		List<Integer> usrLst;
-		int cls, right = 0, wrong = 0;
-		for (Iterator<Integer> i = Environment.errUsrClsLst.keySet().iterator(); i
+		List<Integer> usrItems;
+		int usr, cls, right = 0, wrong = 0;
+		double rate = 0;
+		for (Iterator<Integer> i = Environment.errUsrClsMap.keySet().iterator(); i
 				.hasNext();) {
-			cls = i.next();
-			usrLst = Environment.errUsrClsLst.get(cls);
-			for (int j = 0; j < usrLst.size(); j++) {
-				// Turn back their right cluster
-				if (this.userLeafMap.get(usrLst.get(j)) == cls) {
-					right++;
-				} else {
-					wrong++;
-				}
+			usr = i.next();
+			cls = Environment.errUsrClsMap.get(usr);
+			// for (int j = 0; j < usrLst.size(); j++) {
+			// Turn back their right cluster
+			if (this.userLeafMap.get(usr) == cls) {
+				right++;
+
+			} else {
+				wrong++;
 			}
+			usrItems = Environment.usrReturnMap.get(usr);
+			rate += (double) (usrItems.size() - 1) / usrItems.get(0);
+			System.out.print("User: " + usr + " Chances: " + usrItems.get(0)
+					+ "|");
+			for (int k = 1; k < usrItems.size(); k++) {
+				System.out.print(" " + usrItems.get(k));
+			}
+			System.out.println();
 		}
 		// Print result comparison
 		System.out.println("Right back: " + right);
@@ -162,6 +193,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		System.out.println("Compare: " + (double) right / (right + wrong));
 		System.out.println("Hit Rate: " + (double) this.hitBranch
 				/ Environment.errUsrSet.size());
+		System.out.println("Right Back Rate: " + rate
+				/ Environment.errUsrClsMap.keySet().size());
 	}
 
 	// Compare B-cube-measured clustering

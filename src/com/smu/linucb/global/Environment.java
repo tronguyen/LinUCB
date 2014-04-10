@@ -23,14 +23,15 @@ public class Environment {
 	// 4 Clustering by K-Mean
 	public static Map<Integer, Integer> usrClusterMap = new HashMap<Integer, Integer>();
 	public static Map<Integer, List<Integer>> clusterMap = new HashMap<Integer, List<Integer>>();
-	public static Map<Integer, List<Integer>> errUsrClsLst = new HashMap<Integer, List<Integer>>();
+	public static Map<Integer, Integer> errUsrClsMap = new HashMap<Integer, Integer>();
 	public static Set<Integer> errUsrSet = new HashSet<Integer>();
 	// public static Map<Integer, List<Integer>> clusterExtraMap = new
 	// HashMap<Integer, List<Integer>>();
+	
 
 	// Configure for LinUCB TREE
-	public static int numCluster = 16;
-	public static int numBranch = 16;
+	public static int numCluster = 8;
+	public static int numBranch = 8;
 
 	// Configure for warm-start
 	public static int numWarmIter = 2000;
@@ -43,8 +44,15 @@ public class Environment {
 	public static double alphaUCB = 0.01;
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 20000;
+	public static int limitTime = 50000;
 	public static int numAvgLoop = 1; // Number of thread for each algorithm
 	public static int buffSizeDisplay = 10;
 	public static double percentExchange = 0.1; 
+	
+	// For checking
+	public static Map<Integer, List<Integer>> usrReturnMap = new HashMap<Integer, List<Integer>>(); 
+	
+	// For friend relationship
+	public static Map<Integer, List<Integer>> usrRelationMap = new HashMap<Integer, List<Integer>>();
+
 }
