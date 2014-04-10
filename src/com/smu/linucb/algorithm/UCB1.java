@@ -105,9 +105,9 @@ public class UCB1 {
 					avgY = UCB1.mean.evaluate(rewardRelationVal);
 					boundY = UCB1.var.evaluate(rewardRelationVal);
 				}
-				if (avgY > 0 && avgX > 0) {
-					System.out.println();
-				}
+//				if (avgY > 0 && avgX > 0) {
+//					System.out.println();
+//				}
 				if (Math.abs(avgX - avgY) < Math.abs((boundX - boundY) / 2)) {
 					val = avgY + Environment.alphaUCB * boundY;
 				} else {
