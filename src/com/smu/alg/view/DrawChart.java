@@ -165,7 +165,7 @@ public class DrawChart extends JFrame {
 		// axis.setFixedAutoRange(2000.0);
 		axis = plot.getRangeAxis();
 		// axis.setRange(-50.0, 250.0);
-		axis.setRange(0.0, 5000.0);
+		axis.setRange(0.0, 10000.0);
 		return chart;
 
 	}

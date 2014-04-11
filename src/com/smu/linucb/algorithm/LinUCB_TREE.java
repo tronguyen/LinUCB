@@ -1,5 +1,9 @@
 package com.smu.linucb.algorithm;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,7 +18,6 @@ import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
-import com.smu.linucb.verification.TreeFixedCluster;
 
 public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private double rewardTotal = 0;
@@ -165,37 +168,47 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		List<Integer> usrItems;
 		int usr, cls, right = 0, wrong = 0;
 		double rate = 0;
-		for (Iterator<Integer> i = Environment.errUsrClsMap.keySet().iterator(); i
-				.hasNext();) {
-			usr = i.next();
-			cls = Environment.errUsrClsMap.get(usr);
-			// for (int j = 0; j < usrLst.size(); j++) {
-			// Turn back their right cluster
-			if (this.userLeafMap.get(usr) == cls) {
-				right++;
+		File f = new File("Output4Stats/CheckingErr/Results[" + Environment.numCluster
+				+ "cls-" + Environment.alphaUCB + "alpha]");
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
-			} else {
-				wrong++;
+			for (Iterator<Integer> i = Environment.errUsrClsMap.keySet()
+					.iterator(); i.hasNext();) {
+				usr = i.next();
+				cls = Environment.errUsrClsMap.get(usr);
+				// for (int j = 0; j < usrLst.size(); j++) {
+				// Turn back their right cluster
+				if (this.userLeafMap.get(usr) == cls) {
+					right++;
+				} else {
+					wrong++;
+				}
+				usrItems = Environment.usrReturnMap.get(usr);
+				rate += (double) (usrItems.size() - 1) / usrItems.get(0);
+				bw.write("User: " + usr + " Chances: " + usrItems.get(0) + "|");
+				for (int k = 1; k < usrItems.size(); k++) {
+					bw.write(" " + usrItems.get(k));
+				}
+				bw.write("\n");
 			}
-			usrItems = Environment.usrReturnMap.get(usr);
-			rate += (double) (usrItems.size() - 1) / usrItems.get(0);
-			System.out.print("User: " + usr + " Chances: " + usrItems.get(0)
-					+ "|");
-			for (int k = 1; k < usrItems.size(); k++) {
-				System.out.print(" " + usrItems.get(k));
-			}
-			System.out.println();
+			// Print result comparison
+			bw.write("Right back: " + right + "\n");
+			bw.write("Wrong back: " + wrong + "\n");
+			bw.write("Hit Err-User: " + this.hitBranch + "\n");
+			bw.write("Size error: " + Environment.errUsrSet.size() + "\n");
+			bw.write("Compare: " + (double) right / (right + wrong) + "\n");
+			bw.write("Hit Rate: " + (double) this.hitBranch
+					/ Environment.errUsrSet.size() + "\n");
+			bw.write("Right Back Rate: " + rate
+					/ Environment.errUsrClsMap.keySet().size() + "\n");
+			bw.write("Reward: " + this.rewardTotal + "\n");
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		// Print result comparison
-		System.out.println("Right back: " + right);
-		System.out.println("Wrong back: " + wrong);
-		System.out.println("Hit Err-User: " + this.hitBranch);
-		System.out.println("Size error: " + Environment.errUsrSet.size());
-		System.out.println("Compare: " + (double) right / (right + wrong));
-		System.out.println("Hit Rate: " + (double) this.hitBranch
-				/ Environment.errUsrSet.size());
-		System.out.println("Right Back Rate: " + rate
-				/ Environment.errUsrClsMap.keySet().size());
 	}
 
 	// Compare B-cube-measured clustering
@@ -215,8 +228,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		for (Iterator<Integer> i = this.userLeafMap.keySet().iterator(); i
 				.hasNext();) {
 			int usr = i.next();
-			GlobalFunction
-					.addSpecMap(tempMap, this.userLeafMap.get(usr), usr);
+			GlobalFunction.addSpecMap(tempMap, this.userLeafMap.get(usr), usr);
 		}
 
 		for (Iterator<Integer> i = tempMap.keySet().iterator(); i.hasNext();) {

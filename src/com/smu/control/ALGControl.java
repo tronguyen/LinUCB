@@ -64,8 +64,8 @@ public class ALGControl extends Thread {
 					.getResultSet(GlobalSQLQuery.GETBOOKMARK_TAG));
 
 			// Build User Relations
-			pr.buildContactRelation(new File(
-					"Data/Delicious/user_contacts-timestamps.dat"));
+//			pr.buildContactRelation(new File(
+//					"Data/Delicious/user_contacts-timestamps.dat"));
 
 			// Build user list
 			// pr.buildUserList(dbconn.getResultSet(GlobalSQLQuery.GETUSER));
