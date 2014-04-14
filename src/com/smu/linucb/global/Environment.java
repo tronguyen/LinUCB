@@ -38,10 +38,10 @@ public class Environment {
 	public static int numContextVecs = 25;
 	public static double delta = 0.5;
 	public static double alphaLin = 1 + Math.sqrt(Math.log(2 / delta) / 2);
-	public static double alphaUCB = 1;
+	public static double alphaUCB = 0.1;
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 10000;
-	public static int numAvgLoop = 5;
+	public static int numAvgLoop = 3;
 	public static int buffSizeDisplay = 10;
 }

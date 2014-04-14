@@ -126,6 +126,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 				this.getRewardIndex().remove(0);
 				if (time == Environment.limitTime) {
 					this.interrupt();
+					return;
 				}
 			}
 			try {
