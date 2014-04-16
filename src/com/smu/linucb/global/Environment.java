@@ -42,7 +42,7 @@ public class Environment {
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 10000;
-	public static int numAvgLoop = 4;
+	public static int numAvgLoop = 5;
 	public static int buffSizeDisplay = 10;
 	
 	// DS for treebandit-friend

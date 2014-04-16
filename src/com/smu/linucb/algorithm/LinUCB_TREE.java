@@ -12,10 +12,8 @@ import java.util.Set;
 
 import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
-import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
-import com.smu.linucb.verification.TreeFixedCluster;
 
 public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private double rewardTotal = 0;

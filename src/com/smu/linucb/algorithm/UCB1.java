@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.apache.commons.math3.stat.descriptive.moment.Variance;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import com.smu.linucb.global.Environment;
 
@@ -47,7 +47,7 @@ public class UCB1 {
 	public LinUCB linucb = null;
 	private int indexLeaf;
 	private static Mean mean = new Mean();
-	private static Variance var = new Variance();
+	private static StandardDeviation sd = new StandardDeviation();
 
 	public UCB1(UCB1 pNode) {
 		this.pNode = pNode;
@@ -103,7 +103,7 @@ public class UCB1 {
 					rewardRelationVal = ArrayUtils.toPrimitive(rewardRelation
 							.toArray(new Double[rewardRelation.size()]));
 					avgY = UCB1.mean.evaluate(rewardRelationVal);
-					boundY = UCB1.var.evaluate(rewardRelationVal);
+					boundY = UCB1.sd.evaluate(rewardRelationVal);
 				}
 				if (Math.abs(avgX - avgY) < Math.abs((boundX - boundY) / 2)) {
 					val = avgY + Environment.alphaUCB * boundY;

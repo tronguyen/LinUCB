@@ -105,7 +105,7 @@ public class DrawChart extends JFrame {
 		dataset = new XYSeriesCollection();
 		JFreeChart chart = createChart(dataset);
 		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setPreferredSize(new java.awt.Dimension(800, 400));
+		chartPanel.setPreferredSize(new java.awt.Dimension(600, 400));
 		// this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setContentPane(chartPanel);
 	}
