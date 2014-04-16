@@ -30,8 +30,8 @@ public class Environment {
 	
 
 	// Configure for LinUCB TREE
-	public static int numCluster = 16;
-	public static int numBranch = 16;
+	public static int numCluster = 8;
+	public static int numBranch = 8;
 
 	// Configure for warm-start
 	public static int numWarmIter = 2000;
@@ -54,5 +54,9 @@ public class Environment {
 	
 	// For friend relationship
 	public static Map<Integer, List<Integer>> usrRelationMap = new HashMap<Integer, List<Integer>>();
+	
+	// Compare to LinUCB_Verification
+	public static Map<Integer, Double> trackUserRewardMap = new HashMap<Integer, Double>();
+	public static Map<Integer, Double> typeRewardMap = new HashMap<Integer, Double>();
 
 }

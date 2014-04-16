@@ -385,7 +385,7 @@ public class Preprocessing {
 			br.readLine();
 			while ((l = br.readLine()) != null) {
 				s = l.split("\t");
-				GlobalFunction.addSpecMap(Environment.usrRelationMap,
+				GlobalFunction.addValueMap(Environment.usrRelationMap,
 						Integer.valueOf(s[0]), Integer.valueOf(s[1]));
 			}
 			br.close();

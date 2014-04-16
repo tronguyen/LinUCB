@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+
 import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.global.Environment;
@@ -156,6 +159,11 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 			// Draw chart
 			// this.displayResult(i, this.rewardTotal);
 			this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+
+			// Tracking user reward
+			GlobalFunction.sumValueMap(Environment.trackUserRewardMap, usr,
+					cluster.getPayoff());
+
 		}
 		// Compare to K-Mean clustering
 		// compare2Kmean();
@@ -166,10 +174,12 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	// Compare only 5% changes (95% fixed class) to original clustering (K-Mean)
 	private void compare2Origin() {
 		List<Integer> usrItems;
-		int usr, cls, right = 0, wrong = 0;
-		double rate = 0;
-		File f = new File("Output4Stats/CheckingErr/Results[" + Environment.numCluster
-				+ "cls-" + Environment.alphaUCB + "alpha]");
+		int usr, cls, right = 0, wrong = 0, itemVal, usrType;
+		double rate = 0, usrRW;
+		File f = new File("Output4Stats/TrackingUser/Results["
+				+ Environment.numCluster + "cls-" + Environment.alphaUCB
+				+ "alpha]");
+		List<Integer> returnLst;
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
@@ -177,6 +187,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 					.iterator(); i.hasNext();) {
 				usr = i.next();
 				cls = Environment.errUsrClsMap.get(usr);
+				returnLst = new ArrayList<Integer>();
 				// for (int j = 0; j < usrLst.size(); j++) {
 				// Turn back their right cluster
 				if (this.userLeafMap.get(usr) == cls) {
@@ -188,9 +199,13 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 				rate += (double) (usrItems.size() - 1) / usrItems.get(0);
 				bw.write("User: " + usr + " Chances: " + usrItems.get(0) + "|");
 				for (int k = 1; k < usrItems.size(); k++) {
-					bw.write(" " + usrItems.get(k));
+					itemVal = usrItems.get(k);
+					returnLst.add(itemVal);
+					bw.write(" " + itemVal);
 				}
-				bw.write("\n");
+				usrType = getTypeUser(returnLst, usrItems.get(0));
+				usrRW = Environment.trackUserRewardMap.get(usr);
+				bw.write(" |Type: " + usrType + " |Reward: " + usrRW + "\n");
 			}
 			// Print result comparison
 			bw.write("Right back: " + right + "\n");
@@ -211,6 +226,40 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		}
 	}
 
+	/**
+	 * Get type of user based on list of return-times
+	 * Type1: User has right back
+	 * Type2: User keeps staying in wrong cluster (maybe refined cluster)
+	 * Type3: User wanders around, tries nearly regular-times in each cluster
+	 * otherwise, return type0
+	 * 
+	 * @param returnLst
+	 * @return
+	 */
+
+	private int getTypeUser(List<Integer> returnLst, int totalReturn) {
+		int type = 0, size = returnLst.size() - 1;
+		if (size < 0)
+			return type;
+		double[] val = new double[size];
+		double sdValue, meanValue;
+		StandardDeviation sd = new StandardDeviation();
+		Mean mn = new Mean();
+		for (int i = 1; i <= size; i++) {
+			val[i - 1] = returnLst.get(i) - returnLst.get(i - 1);
+		}
+		sdValue = sd.evaluate(val);
+		meanValue = mn.evaluate(val);
+		if (returnLst.get(size) == totalReturn) {
+			type = 1;
+		} else if ((totalReturn - returnLst.get(size)) / Environment.numCluster >= 2) {
+			type = 2;
+		} else if (sdValue < 2 && Math.abs(meanValue - Environment.numCluster) < 2) {
+			type = 3;
+		}
+		return type;
+	}
+
 	// Compare B-cube-measured clustering
 	private void compare2Kmean() {
 		Set<Set<Integer>> referencePartition = new HashSet<Set<Integer>>();
@@ -228,7 +277,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		for (Iterator<Integer> i = this.userLeafMap.keySet().iterator(); i
 				.hasNext();) {
 			int usr = i.next();
-			GlobalFunction.addSpecMap(tempMap, this.userLeafMap.get(usr), usr);
+			GlobalFunction.addValueMap(tempMap, this.userLeafMap.get(usr), usr);
 		}
 
 		for (Iterator<Integer> i = tempMap.keySet().iterator(); i.hasNext();) {

@@ -87,7 +87,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 				user = Environment.userLst.get(i);
 				cluster = getKmean().clusterInstance(getDataset().instance(i));
 				Environment.usrClusterMap.put(user, cluster);
-				GlobalFunction.addSpecMap(Environment.clusterMap, cluster, user);
+				GlobalFunction.addValueMap(Environment.clusterMap, cluster, user);
 			}
 
 			// Make noise original data
