@@ -250,11 +250,24 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		}
 		sdValue = sd.evaluate(val);
 		meanValue = mn.evaluate(val);
-		if (returnLst.get(size) == totalReturn) {
-			type = 1;
+		if (size >= 2 * Math.floor((double) this.hitBranch
+				/ (Environment.errUsrSet.size() * Environment.numCluster))
+				&& meanValue < 3) {
+			if (sdValue < 2 && returnLst.get(size) == totalReturn) {
+				type = 1;
+			} else {
+				if (returnLst.get(size) == totalReturn) {
+					type = getTypeUser(returnLst.subList(2, returnLst.size()),
+							totalReturn);
+				} else if (totalReturn - returnLst.get(size) <= 3) {
+					type = getTypeUser(returnLst.subList(2, returnLst.size()),
+							returnLst.get(size));
+				}
+			}
 		} else if ((totalReturn - returnLst.get(size)) / Environment.numCluster >= 2) {
 			type = 2;
-		} else if (sdValue < 2 && Math.abs(meanValue - Environment.numCluster) < 2) {
+		} else if (sdValue < 2
+				&& Math.abs(meanValue - Environment.numCluster) < 2) {
 			type = 3;
 		}
 		return type;

@@ -30,8 +30,8 @@ public class Environment {
 	
 
 	// Configure for LinUCB TREE
-	public static int numCluster = 8;
-	public static int numBranch = 8;
+	public static int numCluster = 32;
+	public static int numBranch = 32;
 
 	// Configure for warm-start
 	public static int numWarmIter = 2000;
