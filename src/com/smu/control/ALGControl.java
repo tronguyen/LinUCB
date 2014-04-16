@@ -165,8 +165,8 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-//		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
-//		alg.start();
+		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
+		alg.start();
 
 		// Running LinIND
 		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);

@@ -130,7 +130,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 				}
 			}
 			try {
-				Thread.sleep(50);
+				Thread.sleep(70);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
