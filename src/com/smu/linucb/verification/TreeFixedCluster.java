@@ -90,9 +90,6 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 				GlobalFunction.addValueMap(Environment.clusterMap, cluster, user);
 			}
 
-			// Make noise original data
-			genSyntheticData();
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -149,6 +146,8 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 		} else {
 			alg.setWarmStart(true);
 			alg.setAlgType(AlgorithmType.LINUCB_WARM);
+			// Make noise original data
+			genSyntheticData();
 		}
 		alg.start();
 		this.interrupt();

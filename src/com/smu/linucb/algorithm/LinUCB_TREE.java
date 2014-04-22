@@ -1,7 +1,10 @@
 package com.smu.linucb.algorithm;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -167,21 +170,69 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		}
 		// Compare to K-Mean clustering
 		// compare2Kmean();
-		compare2Origin();
+//		compare2Origin();
+//		displayUserReward4Ver();
 		this.interrupt();
 	}
 
-	// Compare only 5% changes (95% fixed class) to original clustering (K-Mean)
+	private void displayUserReward4Ver() {
+		File fType = new File("Output4Stats/TrackingUser_Warm/Results["
+				+ Environment.numCluster + "cls-" + Environment.alphaUCB
+				+ "alpha]_UserType");
+		File f = new File("Output4Stats/TrackingUser_Ver/Results["
+				+ Environment.numCluster + "cls-" + Environment.alphaUCB
+				+ "alpha]");
+		String str = "";
+		String[] val;
+		Map<Integer, Double> usrTypeRewardMap = new HashMap<Integer, Double>();
+		int usr, usrType;
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(fType));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+			while ((str = br.readLine()) != null) {
+				val = str.split("\\|");
+				usr = Integer.valueOf(val[0]);
+				usrType = Integer.valueOf(val[1]);
+				GlobalFunction.sumValueMap(usrTypeRewardMap, usrType,
+						Environment.trackUserRewardMap.get(usr));
+				bw.write(usr + "|" + Environment.trackUserRewardMap.get(usr)
+						+ "\n");
+			}
+			for (Iterator<Integer> i = usrTypeRewardMap.keySet().iterator(); i
+					.hasNext();) {
+				usrType = i.next();
+				bw.write("Type " + usrType + ": "
+						+ usrTypeRewardMap.get(usrType) + "\n");
+			}
+			bw.write("Reward: " + this.rewardTotal + "\n");
+			br.close();
+			bw.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	// Compare only 10% changes (90% fixed class) to original clustering
+	// (K-Mean)
 	private void compare2Origin() {
 		List<Integer> usrItems;
 		int usr, cls, right = 0, wrong = 0, itemVal, usrType;
 		double rate = 0, usrRW;
-		File f = new File("Output4Stats/TrackingUser/Results["
+		Map<Integer, Double> usrTypeRewardMap = new HashMap<Integer, Double>();
+		File f = new File("Output4Stats/TrackingUser_Warm/Results["
 				+ Environment.numCluster + "cls-" + Environment.alphaUCB
 				+ "alpha]");
+		File fType = new File("Output4Stats/TrackingUser_Warm/Results["
+				+ Environment.numCluster + "cls-" + Environment.alphaUCB
+				+ "alpha]_UserType");
 		List<Integer> returnLst;
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+			BufferedWriter bwType = new BufferedWriter(new FileWriter(fType));
 
 			for (Iterator<Integer> i = Environment.errUsrClsMap.keySet()
 					.iterator(); i.hasNext();) {
@@ -197,7 +248,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 				}
 				usrItems = Environment.usrReturnMap.get(usr);
 				rate += (double) (usrItems.size() - 1) / usrItems.get(0);
-				bw.write("User: " + usr + " Chances: " + usrItems.get(0) + "|");
+				bw.write(usr + "|" + usrItems.get(0) + "<<");
 				for (int k = 1; k < usrItems.size(); k++) {
 					itemVal = usrItems.get(k);
 					returnLst.add(itemVal);
@@ -205,7 +256,11 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 				}
 				usrType = getTypeUser(returnLst, usrItems.get(0));
 				usrRW = Environment.trackUserRewardMap.get(usr);
-				bw.write(" |Type: " + usrType + " |Reward: " + usrRW + "\n");
+				bw.write("|" + usrType + "|" + usrRW + "\n");
+				bwType.write(usr + "|" + usrType + "\n");
+
+				// Sum rewards for each user-type
+				GlobalFunction.sumValueMap(usrTypeRewardMap, usrType, usrRW);
 			}
 			// Print result comparison
 			bw.write("Right back: " + right + "\n");
@@ -218,8 +273,17 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 			bw.write("Right Back Rate: " + rate
 					/ Environment.errUsrClsMap.keySet().size() + "\n");
 			bw.write("Reward: " + this.rewardTotal + "\n");
+
+			for (Iterator<Integer> i = usrTypeRewardMap.keySet().iterator(); i
+					.hasNext();) {
+				usrType = i.next();
+				bw.write("Type " + usrType + ": "
+						+ usrTypeRewardMap.get(usrType) + "\n");
+			}
+
 			bw.flush();
 			bw.close();
+			bwType.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
