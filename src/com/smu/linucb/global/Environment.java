@@ -41,7 +41,7 @@ public class Environment {
 	public static double alphaUCB = 0.1;
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 10000;
+	public static int limitTime = 20000;
 	public static int numAvgLoop = 3;
 	public static int buffSizeDisplay = 10;
 }
