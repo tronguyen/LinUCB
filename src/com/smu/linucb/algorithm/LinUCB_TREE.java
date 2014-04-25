@@ -107,27 +107,27 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 						cur = UCB1.impl(usr, cur);
 					}
 					// Increase num of hits (users err-switched)
-					this.hitBranch++;
-					if (Environment.usrReturnMap.containsKey(usr)) {
-						rightBackOrder = Environment.usrReturnMap.get(usr).get(
-								0) + 1;
-						Environment.usrReturnMap.get(usr)
-								.set(0, rightBackOrder);
-						if (cur.getIndexLeaf() == Environment.errUsrClsMap
-								.get(usr)) {
-							Environment.usrReturnMap.get(usr).add(
-									rightBackOrder);
-						}
-					} else {
-						itemOrder = new ArrayList<Integer>();
-						itemOrder.add(1);
-						if (cur.getIndexLeaf() == Environment.errUsrClsMap
-								.get(usr)) {
-							itemOrder.add(1);
-						}
-						Environment.usrReturnMap.put(usr, itemOrder);
-
-					}
+//					this.hitBranch++;
+//					if (Environment.usrReturnMap.containsKey(usr)) {
+//						rightBackOrder = Environment.usrReturnMap.get(usr).get(
+//								0) + 1;
+//						Environment.usrReturnMap.get(usr)
+//								.set(0, rightBackOrder);
+//						if (cur.getIndexLeaf() == Environment.errUsrClsMap
+//								.get(usr)) {
+//							Environment.usrReturnMap.get(usr).add(
+//									rightBackOrder);
+//						}
+//					} else {
+//						itemOrder = new ArrayList<Integer>();
+//						itemOrder.add(1);
+//						if (cur.getIndexLeaf() == Environment.errUsrClsMap
+//								.get(usr)) {
+//							itemOrder.add(1);
+//						}
+//						Environment.usrReturnMap.put(usr, itemOrder);
+//
+//					}
 				} else {
 					// Select randomly cluster for user having the first time
 					// falling
@@ -164,8 +164,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 			this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 
 			// Tracking user reward
-			GlobalFunction.sumValueMap(Environment.trackUserRewardMap, usr,
-					cluster.getPayoff());
+//			GlobalFunction.sumValueMap(Environment.trackUserRewardMap, usr,
+//					cluster.getPayoff());
 
 		}
 		// Compare to K-Mean clustering

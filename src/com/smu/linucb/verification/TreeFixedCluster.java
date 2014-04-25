@@ -147,7 +147,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 			alg.setWarmStart(true);
 			alg.setAlgType(AlgorithmType.LINUCB_WARM);
 			// Make noise original data
-			genSyntheticData();
+//			genSyntheticData();
 		}
 		alg.start();
 		this.interrupt();
