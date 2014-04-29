@@ -91,88 +91,123 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		int index;
 		List<Integer> itemOrder;
 		int rightBackOrder = 0;
-		for (int i = 1; i <= Environment.limitTime; i++) {
-			// Pick user randomly
-			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
-					.size()));
-			if (!this.isFixedCluster()) {
-				if (this.fstTimeUsrLst.contains(usr)
-						&& (!this.isWarmStart || (this.isWarmStart
-								&& /*Environment.errUsrSet.contains(usr) &&*/ this.warmIter > Environment.numWarmIter))) {
-					/*
-					 * Run UCB1. Find the cluster the user to which belongs
-					 */
-					cur = this.rootTree;
-					while (cur.childLst.size() != 0) {
-						cur = UCB1.impl(usr, cur);
-					}
-					// Increase num of hits (users err-switched)
-//					this.hitBranch++;
-//					if (Environment.usrReturnMap.containsKey(usr)) {
-//						rightBackOrder = Environment.usrReturnMap.get(usr).get(
-//								0) + 1;
-//						Environment.usrReturnMap.get(usr)
-//								.set(0, rightBackOrder);
-//						if (cur.getIndexLeaf() == Environment.errUsrClsMap
-//								.get(usr)) {
-//							Environment.usrReturnMap.get(usr).add(
-//									rightBackOrder);
-//						}
-//					} else {
-//						itemOrder = new ArrayList<Integer>();
-//						itemOrder.add(1);
-//						if (cur.getIndexLeaf() == Environment.errUsrClsMap
-//								.get(usr)) {
-//							itemOrder.add(1);
-//						}
-//						Environment.usrReturnMap.put(usr, itemOrder);
-//
-//					}
-				} else {
-					// Select randomly cluster for user having the first time
-					// falling
-					// down
-					this.fstTimeUsrLst.add(usr);
-					if (!this.isWarmStart) {
-						cur = this.leavesTree.get(this.rClus
-								.nextInt(Environment.numCluster));
+		long threadID = this.getId();
+		File f = new File(Environment.RW2FILE + "_" + threadID);
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+
+			for (int i = 1; i <= Environment.limitTime; i++) {
+				// Pick user randomly
+				usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
+						.size()));
+				if (!this.isFixedCluster()) {
+					if (this.fstTimeUsrLst.contains(usr)
+							&& (!this.isWarmStart || (this.isWarmStart && /*
+																		 * Environment
+																		 * .
+																		 * errUsrSet
+																		 * .
+																		 * contains(
+																		 * usr)
+																		 * &&
+																		 */this.warmIter > Environment.numWarmIter))) {
+						/*
+						 * Run UCB1. Find the cluster the user to which belongs
+						 */
+						cur = this.rootTree;
+						while (cur.childLst.size() != 0) {
+							cur = UCB1.impl(usr, cur);
+						}
+						// Increase num of hits (users err-switched)
+						// this.hitBranch++;
+						// if (Environment.usrReturnMap.containsKey(usr)) {
+						// rightBackOrder =
+						// Environment.usrReturnMap.get(usr).get(
+						// 0) + 1;
+						// Environment.usrReturnMap.get(usr)
+						// .set(0, rightBackOrder);
+						// if (cur.getIndexLeaf() == Environment.errUsrClsMap
+						// .get(usr)) {
+						// Environment.usrReturnMap.get(usr).add(
+						// rightBackOrder);
+						// }
+						// } else {
+						// itemOrder = new ArrayList<Integer>();
+						// itemOrder.add(1);
+						// if (cur.getIndexLeaf() == Environment.errUsrClsMap
+						// .get(usr)) {
+						// itemOrder.add(1);
+						// }
+						// Environment.usrReturnMap.put(usr, itemOrder);
+						//
+						// }
 					} else {
-						cur = this.leavesTree.get(Environment.usrClusterMap
-								.get(usr));
-						this.warmIter++;
+						// Select randomly cluster for user having the first
+						// time
+						// falling
+						// down
+						this.fstTimeUsrLst.add(usr);
+						if (!this.isWarmStart) {
+							cur = this.leavesTree.get(this.rClus
+									.nextInt(Environment.numCluster));
+						} else {
+							cur = this.leavesTree.get(Environment.usrClusterMap
+									.get(usr));
+							this.warmIter++;
+						}
 					}
+				} else {
+					cur = this.leavesTree.get(Environment.usrClusterMap
+							.get(usr));
 				}
-			} else {
-				cur = this.leavesTree.get(Environment.usrClusterMap.get(usr));
+				// Put user into leaf
+				this.userLeafMap.put(usr, cur.getIndexLeaf());
+
+				// Run LinUCB for the cluster
+				cluster = cur.linucb;
+				cluster.setUser(usr);
+				cluster.impl();
+				cluster.reset();
+
+				// Update weight for the path
+				LinUCB_TREE.backPropagation(cur, cluster.getPayoff(), usr);
+
+				this.rewardTotal += cluster.getPayoff();
+
+				// Draw chart
+				// this.displayResult(i, this.rewardTotal);
+				
+//				this.updateRewardMap(this.getInClass(), i, this.rewardTotal); // 4Drawing
+				printRW2File(i, this.rewardTotal, f, bw); //4PrintFile
+				// Tracking user reward
+				// GlobalFunction.sumValueMap(Environment.trackUserRewardMap,
+				// usr,
+				// cluster.getPayoff());
+
 			}
-			// Put user into leaf
-			this.userLeafMap.put(usr, cur.getIndexLeaf());
-
-			// Run LinUCB for the cluster
-			cluster = cur.linucb;
-			cluster.setUser(usr);
-			cluster.impl();
-			cluster.reset();
-
-			// Update weight for the path
-			LinUCB_TREE.backPropagation(cur, cluster.getPayoff(), usr);
-
-			this.rewardTotal += cluster.getPayoff();
-
-			// Draw chart
-			// this.displayResult(i, this.rewardTotal);
-			this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
-
-			// Tracking user reward
-//			GlobalFunction.sumValueMap(Environment.trackUserRewardMap, usr,
-//					cluster.getPayoff());
-
+			bw.flush();
+			bw.close();
+			// Compare to K-Mean clustering
+			// compare2Kmean();
+			// compare2Origin();
+			// displayUserReward4Ver();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		// Compare to K-Mean clustering
-		// compare2Kmean();
-//		compare2Origin();
-//		displayUserReward4Ver();
 		this.interrupt();
+	}
+
+	private void printRW2File(int count, double rw, File f, BufferedWriter bw) {
+		if ((count % Environment.buffSizeDisplay) == 0) {
+			try {
+				bw.write(count + "|" + rw + "\n");
+				bw.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void displayUserReward4Ver() {

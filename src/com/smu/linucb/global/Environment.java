@@ -28,6 +28,9 @@ public class Environment {
 	// public static Map<Integer, List<Integer>> clusterExtraMap = new
 	// HashMap<Integer, List<Integer>>();
 	
+	public static String RW2FILE = "Output4Stats/RW2File/";
+//	public static String RW2FILEMERGED = "Output4Stats/RW2File";
+	
 
 	// Configure for LinUCB TREE
 	public static int numCluster = 16;
@@ -44,8 +47,8 @@ public class Environment {
 	public static double alphaUCB = 0;//Math.pow(10, -10); //Fixed 0.1 for best
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 10000;
-	public static int numAvgLoop = 5; // Number of thread for each algorithm
+	public static int limitTime = 70000;
+	public static int numAvgLoop = 10; // Number of thread for each algorithm
 	public static int buffSizeDisplay = 10;
 	public static double percentExchange = 0.1; 
 	
