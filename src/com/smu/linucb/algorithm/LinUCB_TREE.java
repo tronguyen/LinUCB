@@ -98,7 +98,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 			if (!this.isFixedCluster()) {
 				if (this.fstTimeUsrLst.contains(usr)
 						&& (!this.isWarmStart || (this.isWarmStart
-								&& Environment.errUsrSet.contains(usr) && this.warmIter > Environment.numWarmIter))) {
+								&& /*Environment.errUsrSet.contains(usr) &&*/ this.warmIter > Environment.numWarmIter))) {
 					/*
 					 * Run UCB1. Find the cluster the user to which belongs
 					 */

@@ -121,7 +121,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 					rewardDisplay = this.getRewardMonitor().get(time).getReward()
 							/ Environment.numAvgLoop;
 					this.displayResult(time, rewardDisplay);
-//					System.out.println("Time: " + time + " Reward: " + rewardDisplay);
+					System.out.println("Time: " + time + " Reward: " + rewardDisplay);
 				}
 				this.getRewardIndex().remove(0);
 				if (time == Environment.limitTime) {
@@ -131,7 +131,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 				}
 			}
 			try {
-				Thread.sleep(80);
+				Thread.sleep(60);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

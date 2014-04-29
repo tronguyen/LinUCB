@@ -178,8 +178,8 @@ public class ALGControl extends Thread {
 
 		// Running verification && Warmstart
 		TreeFixedCluster.doCluster();
-//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
-//		 alg.start();
+		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
+		 alg.start();
 
 		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
 		alg.start();
