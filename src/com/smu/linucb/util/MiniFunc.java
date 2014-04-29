@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,8 +27,12 @@ public class MiniFunc {
 	int iter;
 
 	public void mergeFile() throws IOException {
-		File f = new File(Environment.RW2FILE);
-		File[] fLst = f.listFiles();
+		File f = new File(Environment.RW2FILE_WARM);
+		File[] fLst = f.listFiles(new FilenameFilter(){
+		    public boolean accept(File directory, String fileName) {
+		        return fileName.matches("\\_[\\d]+");
+		    }
+		});
 		for (File fin : fLst) {
 			br = new BufferedReader(new FileReader(fin));
 			while ((s = br.readLine()) != null) {
@@ -36,9 +41,10 @@ public class MiniFunc {
 						Double.valueOf(line[1]));
 			}
 			br.close();
+			fin.delete();
 		}
-		bw = new BufferedWriter(new FileWriter(new File(Environment.RW2FILE
-				+ "_merged")));
+		bw = new BufferedWriter(new FileWriter(new File(Environment.RW2FILE_WARM
+				+ "_merged_" + Environment.alphaUCB)));
 		for (Iterator<Integer> it = res.keySet().iterator(); it.hasNext();) {
 			iter = it.next();
 			bw.write(iter + "|" + res.get(iter) / Environment.numAvgLoop + "\n");

@@ -22,6 +22,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
+import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
 
@@ -92,7 +93,12 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		List<Integer> itemOrder;
 		int rightBackOrder = 0;
 		long threadID = this.getId();
-		File f = new File(Environment.RW2FILE + "_" + threadID);
+		File f = null;
+		if(this.getAlgType() == AlgorithmType.LINUCB_WARM){
+			f = new File(Environment.RW2FILE_WARM + "_" + threadID);
+		} else if(this.getAlgType() == AlgorithmType.LINUCB_VER){
+			f = new File(Environment.RW2FILE_VER + "_" + threadID);
+		}
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
@@ -176,9 +182,9 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 
 				// Draw chart
 				// this.displayResult(i, this.rewardTotal);
-				
 //				this.updateRewardMap(this.getInClass(), i, this.rewardTotal); // 4Drawing
 				printRW2File(i, this.rewardTotal, f, bw); //4PrintFile
+				
 				// Tracking user reward
 				// GlobalFunction.sumValueMap(Environment.trackUserRewardMap,
 				// usr,

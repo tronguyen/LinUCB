@@ -28,8 +28,8 @@ public class Environment {
 	// public static Map<Integer, List<Integer>> clusterExtraMap = new
 	// HashMap<Integer, List<Integer>>();
 	
-	public static String RW2FILE = "Output4Stats/RW2File/";
-//	public static String RW2FILEMERGED = "Output4Stats/RW2File";
+	public static String RW2FILE_WARM = "Output4Stats/RW2File_WARM/";
+	public static String RW2FILE_VER = "Output4Stats/RW2File_VER/";
 	
 
 	// Configure for LinUCB TREE
