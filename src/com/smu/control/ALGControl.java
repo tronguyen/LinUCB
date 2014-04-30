@@ -181,7 +181,7 @@ public class ALGControl extends Thread {
 		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
 		 alg.start();
 
-		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
-		alg.start();
+//		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
+//		alg.start();
 	}
 }

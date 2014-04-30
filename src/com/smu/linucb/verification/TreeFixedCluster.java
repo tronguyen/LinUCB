@@ -143,6 +143,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 		if (!this.warmStart) {
 			alg.setFixedCluster(true);
 			alg.setAlgType(AlgorithmType.LINUCB_VER);
+			genSyntheticData();
 		} else {
 			alg.setWarmStart(true);
 			alg.setAlgType(AlgorithmType.LINUCB_WARM);
