@@ -112,31 +112,31 @@ public class AlgorithmThreadBuilder extends ALGControl {
 			alg.setInClass(this);
 			alg.start();
 		}
-		int time;
-		double rewardDisplay = 0;
-		while (true) {
-			if (this.getRewardIndex().size() != 0) {
-				time = this.getRewardIndex().get(0);
-				if (this.getRewardMonitor().get(time).getCount() == Environment.numAvgLoop) {
-					rewardDisplay = this.getRewardMonitor().get(time).getReward()
-							/ Environment.numAvgLoop;
-					this.displayResult(time, rewardDisplay);
-					System.out.println("Time: " + time + " Reward: " + rewardDisplay);
-				}
-				this.getRewardIndex().remove(0);
-				if (time == Environment.limitTime) {
-					System.out.println("Reward: " + rewardDisplay);
-					this.interrupt();
-					return;
-				}
-			}
-			try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		int time;
+//		double rewardDisplay = 0;
+//		while (true) {
+//			if (this.getRewardIndex().size() != 0) {
+//				time = this.getRewardIndex().get(0);
+//				if (this.getRewardMonitor().get(time).getCount() == Environment.numAvgLoop) {
+//					rewardDisplay = this.getRewardMonitor().get(time).getReward()
+//							/ Environment.numAvgLoop;
+//					this.displayResult(time, rewardDisplay);
+//					System.out.println("Time: " + time + " Reward: " + rewardDisplay);
+//				}
+//				this.getRewardIndex().remove(0);
+//				if (time == Environment.limitTime) {
+//					System.out.println("Reward: " + rewardDisplay);
+//					this.interrupt();
+//					return;
+//				}
+//			}
+//			try {
+//				Thread.sleep(20);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	protected synchronized void updateRewardMap(AlgorithmThreadBuilder rwMap, int count,

@@ -20,11 +20,10 @@ public class Environment {
 	public static Set<Integer> removedBM = new HashSet<Integer>();
 	public static DrawChart drChart = new DrawChart("Multi-Bandits Algorithm");
 
-	// 4 Clustering by K-Mean
 	public static Map<Integer, Integer> usrClusterMap = new HashMap<Integer, Integer>();
 	public static Map<Integer, List<Integer>> clusterMap = new HashMap<Integer, List<Integer>>();
-	public static Map<Integer, Integer> errUsrClsMap = new HashMap<Integer, Integer>();
-	public static Set<Integer> errUsrSet = new HashSet<Integer>();
+
+	
 	// public static Map<Integer, List<Integer>> clusterExtraMap = new
 	// HashMap<Integer, List<Integer>>();
 	
@@ -44,8 +43,8 @@ public class Environment {
 	public static double alphaUCB = Math.pow(10, -3); //Fixed 0.1 for best
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 70000;
-	public static int numAvgLoop = 3; // Number of thread for each algorithm
+	public static int limitTime = 10000;
+	public static int numAvgLoop = 2; // Number of thread for each algorithm
 	public static int buffSizeDisplay = 10;
 	public static double percentExchange = 0.1; 
 	
@@ -60,4 +59,6 @@ public class Environment {
 	public static Map<Integer, Double> trackUserRewardMap = new HashMap<Integer, Double>();
 	public static Map<Integer, Double> typeRewardMap = new HashMap<Integer, Double>();
 
+	public static String RW2FILE_WARM = "Output4Stats/RW2File_WARM/";
+	public static String RW2FILE_VER = "Output4Stats/RW2File_VER/";
 }

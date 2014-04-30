@@ -87,50 +87,13 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 				user = Environment.userLst.get(i);
 				cluster = getKmean().clusterInstance(getDataset().instance(i));
 				Environment.usrClusterMap.put(user, cluster);
-				GlobalFunction.addValueMap(Environment.clusterMap, cluster, user);
+				GlobalFunction.addValueMap(Environment.clusterMap, cluster,
+						user);
 			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-
-
-	public static void genSyntheticData() {
-		List<Integer> clusterLst = new ArrayList<Integer>(
-				Environment.clusterMap.keySet());
-		// Map<Integer, List<Integer>> rmMap = new HashMap<Integer,
-		// List<Integer>>();
-		Random r = new Random();
-		int lenClus = 0, lenRun = 0;
-		int chosenUsr, chosenUsrIndex, chosenCls, clsIndex;
-		for (int cls : clusterLst) {
-			lenClus = (int) (Environment.clusterMap.get(cls).size() * Environment.percentExchange);
-			lenRun = lenClus;
-			// pick random 5% items
-			for (int k = 0; k < lenClus; k++) {
-				// pick randomly one user in cluster
-				chosenUsrIndex = r.nextInt(lenRun--);
-				chosenUsr = Environment.clusterMap.get(cls).get(chosenUsrIndex);
-				// pick randomly cluster to push the user in
-				clsIndex = r.nextInt(clusterLst.size());
-				chosenCls = clusterLst.get(clsIndex);
-				if (chosenCls == cls) {
-					chosenCls = clusterLst.get((clsIndex + 1)
-							% clusterLst.size());
-				}
-				// Check 5%: Keep track of original status of user
-				Environment.errUsrClsMap.put(chosenUsr, cls);
-				Environment.errUsrSet.add(chosenUsr);
-				Environment.clusterMap.get(cls).remove(chosenUsrIndex);
-				// addSpecMap(Environment.clusterExtraMap, chosenCls,
-				// chosenUsr);
-				// addSpecMap(rmMap, cls, chosenUsr);
-
-				// Change user-cluster Map
-				Environment.usrClusterMap.put(chosenUsr, chosenCls);
-			}
 		}
 	}
 
@@ -140,15 +103,14 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 		// Enable fixedCluster mode --> true
 		alg = new LinUCB_TREE();
 		alg.setInClass(this.getInClass());
+		// Make noise original data
+		alg.setIncludedErr(true);
 		if (!this.warmStart) {
 			alg.setFixedCluster(true);
 			alg.setAlgType(AlgorithmType.LINUCB_VER);
-			genSyntheticData();
 		} else {
 			alg.setWarmStart(true);
 			alg.setAlgType(AlgorithmType.LINUCB_WARM);
-			// Make noise original data
-//			genSyntheticData();
 		}
 		alg.start();
 		this.interrupt();

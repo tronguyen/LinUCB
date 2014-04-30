@@ -22,6 +22,7 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import com.aliasi.cluster.ClusterScore;
 import com.smu.control.AlgorithmThreadBuilder;
+import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
 
@@ -38,6 +39,15 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private int indexLeaf = 0;
 	private Map<Integer, Integer> userLeafMap = new HashMap<Integer, Integer>();
 	private int hitBranch = 0;
+	private boolean includedErr = false;
+
+	// 4 Clustering by K-Mean
+	public Map<Integer, Integer> usrClusterMap = new HashMap<Integer, Integer>(
+			Environment.usrClusterMap);
+	public Map<Integer, List<Integer>> clusterMap = new HashMap<Integer, List<Integer>>(
+			Environment.clusterMap);
+	public Map<Integer, Integer> errUsrClsMap = new HashMap<Integer, Integer>();
+	public Set<Integer> errUsrSet = new HashSet<Integer>();
 
 	public LinUCB_TREE() {
 		// super(AlgorithmType.LINUCB_TREE);
@@ -81,6 +91,10 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 
 	@Override
 	public void run() {
+		if (this.isIncludedErr()) {
+			this.genSyntheticData();
+		}
+
 		int usr;
 		this.rootTree = new UCB1();
 		UCB1 cur = null;
@@ -91,113 +105,146 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		int index;
 		List<Integer> itemOrder;
 		int rightBackOrder = 0;
-		for (int i = 1; i <= Environment.limitTime; i++) {
-			// Pick user randomly
-			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
-					.size()));
-			if (!this.isFixedCluster()) {
-				if (this.fstTimeUsrLst.contains(usr)
-						&& (!this.isWarmStart || (this.isWarmStart
-								&& Environment.errUsrSet.contains(usr) && this.warmIter > Environment.numWarmIter))) {
-					/*
-					 * Run UCB1. Find the cluster the user to which belongs
-					 */
-					cur = this.rootTree;
-					while (cur.childLst.size() != 0) {
-						cur = UCB1.impl(usr, cur);
-					}
-					// Checking: Reward User after Warm-Step
-//					if (!Environment.rwUserAfterWarm.containsKey(usr)) {
-//						Environment.rwUserAfterWarm
-//								.put(usr, this.leavesTree.get(this.userLeafMap
-//										.get(usr)).payoffMap.get(usr)
-//										.getPayoff());
-//					}
+		File f = null;
+		long threadID = this.getId();
+		if (this.getAlgType() == AlgorithmType.LINUCB_WARM) {
+			f = new File(Environment.RW2FILE_WARM + "_" + threadID);
+		} else if (this.getAlgType() == AlgorithmType.LINUCB_VER) {
+			f = new File(Environment.RW2FILE_VER + "_" + threadID);
+		}
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(f));
 
-					// Increase num of hits (users err-switched)
-					// this.hitBranch++;
-					// if (Environment.usrReturnMap.containsKey(usr)) {
-					// rightBackOrder = Environment.usrReturnMap.get(usr).get(
-					// 0) + 1;
-					// Environment.usrReturnMap.get(usr)
-					// .set(0, rightBackOrder);
-					// if (cur.getIndexLeaf() == Environment.errUsrClsMap
-					// .get(usr)) {
-					// Environment.usrReturnMap.get(usr).add(
-					// rightBackOrder);
-					// }
-					// } else {
-					// itemOrder = new ArrayList<Integer>();
-					// itemOrder.add(1);
-					// if (cur.getIndexLeaf() == Environment.errUsrClsMap
-					// .get(usr)) {
-					// itemOrder.add(1);
-					// }
-					// Environment.usrReturnMap.put(usr, itemOrder);
-					//
-					// }
-				} else {
-					// Select randomly cluster for user having the first time
-					// falling
-					// down
-					this.fstTimeUsrLst.add(usr);
-					if (!this.isWarmStart) {
-						cur = this.leavesTree.get(this.rClus
-								.nextInt(Environment.numCluster));
+			for (int i = 1; i <= Environment.limitTime; i++) {
+				// Pick user randomly
+				usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
+						.size()));
+				if (!this.isFixedCluster()) {
+					if (this.fstTimeUsrLst.contains(usr)
+							&& (!this.isWarmStart || (this.isWarmStart
+									&& this.errUsrSet.contains(usr) && this.warmIter > Environment.numWarmIter))) {
+						/*
+						 * Run UCB1. Find the cluster the user to which belongs
+						 */
+						cur = this.rootTree;
+						while (cur.childLst.size() != 0) {
+							cur = UCB1.impl(usr, cur);
+						}
+						// Checking: Reward User after Warm-Step
+						// if (!Environment.rwUserAfterWarm.containsKey(usr)) {
+						// Environment.rwUserAfterWarm
+						// .put(usr, this.leavesTree.get(this.userLeafMap
+						// .get(usr)).payoffMap.get(usr)
+						// .getPayoff());
+						// }
+
+						// Increase num of hits (users err-switched)
+						// this.hitBranch++;
+						// if (Environment.usrReturnMap.containsKey(usr)) {
+						// rightBackOrder =
+						// Environment.usrReturnMap.get(usr).get(
+						// 0) + 1;
+						// Environment.usrReturnMap.get(usr)
+						// .set(0, rightBackOrder);
+						// if (cur.getIndexLeaf() == Environment.errUsrClsMap
+						// .get(usr)) {
+						// Environment.usrReturnMap.get(usr).add(
+						// rightBackOrder);
+						// }
+						// } else {
+						// itemOrder = new ArrayList<Integer>();
+						// itemOrder.add(1);
+						// if (cur.getIndexLeaf() == Environment.errUsrClsMap
+						// .get(usr)) {
+						// itemOrder.add(1);
+						// }
+						// Environment.usrReturnMap.put(usr, itemOrder);
+						//
+						// }
 					} else {
-						cur = this.leavesTree.get(Environment.usrClusterMap
-								.get(usr));
-						this.warmIter++;
+						// Select randomly cluster for user having the first
+						// time
+						// falling
+						// down
+						this.fstTimeUsrLst.add(usr);
+						if (!this.isWarmStart) {
+							cur = this.leavesTree.get(this.rClus
+									.nextInt(Environment.numCluster));
+						} else {
+							cur = this.leavesTree.get(this.usrClusterMap
+									.get(usr));
+							this.warmIter++;
+						}
 					}
+				} else {
+					cur = this.leavesTree.get(this.usrClusterMap.get(usr));
 				}
-			} else {
-				cur = this.leavesTree.get(Environment.usrClusterMap.get(usr));
+				// Put user into leaf
+				this.userLeafMap.put(usr, cur.getIndexLeaf());
+
+				// Run LinUCB for the cluster
+				cluster = cur.linucb;
+				cluster.setUser(usr);
+				cluster.impl();
+				cluster.reset();
+
+				// Update weight for the path
+				LinUCB_TREE.backPropagation(cur, cluster.getPayoff(), usr);
+
+				this.rewardTotal += cluster.getPayoff();
+
+				// Draw chart
+				// this.displayResult(i, this.rewardTotal);
+				// this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+				printRW2File(i, this.rewardTotal, f, bw); // 4PrintFile
+
+				// Tracking user reward
+				// GlobalFunction.sumValueMap(Environment.trackUserRewardMap,
+				// usr,
+				// cluster.getPayoff());
+
 			}
-			// Put user into leaf
-			this.userLeafMap.put(usr, cur.getIndexLeaf());
-
-			// Run LinUCB for the cluster
-			cluster = cur.linucb;
-			cluster.setUser(usr);
-			cluster.impl();
-			cluster.reset();
-
-			// Update weight for the path
-			LinUCB_TREE.backPropagation(cur, cluster.getPayoff(), usr);
-
-			this.rewardTotal += cluster.getPayoff();
-
-			// Draw chart
-			// this.displayResult(i, this.rewardTotal);
-			this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
-
-			// Tracking user reward
-			// GlobalFunction.sumValueMap(Environment.trackUserRewardMap, usr,
-			// cluster.getPayoff());
-
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		// Print Reward User after Warm-Step
-//		try {
-//			BufferedWriter bww = new BufferedWriter(new FileWriter(new File(
-//					"Output4Stats/afterwarm" + Environment.alphaUCB)));
-//			int k;
-//			for (Iterator<Integer> it = Environment.rwUserAfterWarm.keySet()
-//					.iterator(); it.hasNext();) {
-//				k = it.next();
-//				bww.write(k + "\t" + Environment.rwUserAfterWarm.get(k) + "\n");
-//			}
-//			bww.flush();
-//			bww.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		// try {
+		// BufferedWriter bww = new BufferedWriter(new FileWriter(new File(
+		// "Output4Stats/afterwarm" + Environment.alphaUCB)));
+		// int k;
+		// for (Iterator<Integer> it = Environment.rwUserAfterWarm.keySet()
+		// .iterator(); it.hasNext();) {
+		// k = it.next();
+		// bww.write(k + "\t" + Environment.rwUserAfterWarm.get(k) + "\n");
+		// }
+		// bww.flush();
+		// bww.close();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 
 		// Compare to K-Mean clustering
 		// compare2Kmean();
 		// compare2Origin();
 		// displayUserReward4Ver();
 		this.interrupt();
+	}
+
+	private void printRW2File(int count, double rw, File f, BufferedWriter bw) {
+		if ((count % Environment.buffSizeDisplay) == 0) {
+			try {
+				bw.write(count + "|" + rw + "\n");
+				bw.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void displayUserReward4Ver() {
@@ -259,10 +306,10 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 			BufferedWriter bwType = new BufferedWriter(new FileWriter(fType));
 
-			for (Iterator<Integer> i = Environment.errUsrClsMap.keySet()
-					.iterator(); i.hasNext();) {
+			for (Iterator<Integer> i = this.errUsrClsMap.keySet().iterator(); i
+					.hasNext();) {
 				usr = i.next();
-				cls = Environment.errUsrClsMap.get(usr);
+				cls = this.errUsrClsMap.get(usr);
 				returnLst = new ArrayList<Integer>();
 				// for (int j = 0; j < usrLst.size(); j++) {
 				// Turn back their right cluster
@@ -291,12 +338,12 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 			bw.write("Right back: " + right + "\n");
 			bw.write("Wrong back: " + wrong + "\n");
 			bw.write("Hit Err-User: " + this.hitBranch + "\n");
-			bw.write("Size error: " + Environment.errUsrSet.size() + "\n");
+			bw.write("Size error: " + this.errUsrSet.size() + "\n");
 			bw.write("Compare: " + (double) right / (right + wrong) + "\n");
 			bw.write("Hit Rate: " + (double) this.hitBranch
-					/ Environment.errUsrSet.size() + "\n");
+					/ this.errUsrSet.size() + "\n");
 			bw.write("Right Back Rate: " + rate
-					/ Environment.errUsrClsMap.keySet().size() + "\n");
+					/ this.errUsrClsMap.keySet().size() + "\n");
 			bw.write("Reward: " + this.rewardTotal + "\n");
 
 			for (Iterator<Integer> i = usrTypeRewardMap.keySet().iterator(); i
@@ -340,7 +387,7 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		sdValue = sd.evaluate(val);
 		meanValue = mn.evaluate(val);
 		if (size >= 2 * Math.floor((double) this.hitBranch
-				/ (Environment.errUsrSet.size() * Environment.numCluster))
+				/ (this.errUsrSet.size() * Environment.numCluster))
 				&& meanValue < 3) {
 			if (sdValue < 2 && returnLst.get(size) == totalReturn) {
 				type = 1;
@@ -366,14 +413,13 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	private void compare2Kmean() {
 		Set<Set<Integer>> referencePartition = new HashSet<Set<Integer>>();
 		Set<Set<Integer>> responsePartition = new HashSet<Set<Integer>>();
-		for (Iterator<Integer> i = Environment.clusterMap.keySet().iterator(); i
+		for (Iterator<Integer> i = this.clusterMap.keySet().iterator(); i
 				.hasNext();) {
-			referencePartition.add(new HashSet(Environment.clusterMap.get(i
-					.next())));
+			referencePartition.add(new HashSet(this.clusterMap.get(i.next())));
 		}
 
 		System.out.println("reference set");
-		printMap(Environment.clusterMap);
+		printMap(this.clusterMap);
 		Map<Integer, List<Integer>> tempMap = new HashMap<Integer, List<Integer>>();
 		// Convert response to clusterMap
 		for (Iterator<Integer> i = this.userLeafMap.keySet().iterator(); i
@@ -403,6 +449,43 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		System.out.println("  Element Averaged F(1) = " + score.b3ElementF());
 	}
 
+	public void genSyntheticData() {
+		List<Integer> clusterLst = new ArrayList<Integer>(
+				this.clusterMap.keySet());
+		// Map<Integer, List<Integer>> rmMap = new HashMap<Integer,
+		// List<Integer>>();
+		Random r = new Random();
+		int lenClus = 0, lenRun = 0;
+		int chosenUsr, chosenUsrIndex, chosenCls, clsIndex;
+		for (int cls : clusterLst) {
+			lenClus = (int) (this.clusterMap.get(cls).size() * Environment.percentExchange);
+			lenRun = lenClus;
+			// pick random 5% items
+			for (int k = 0; k < lenClus; k++) {
+				// pick randomly one user in cluster
+				chosenUsrIndex = r.nextInt(lenRun--);
+				chosenUsr = this.clusterMap.get(cls).get(chosenUsrIndex);
+				// pick randomly cluster to push the user in
+				clsIndex = r.nextInt(clusterLst.size());
+				chosenCls = clusterLst.get(clsIndex);
+				if (chosenCls == cls) {
+					chosenCls = clusterLst.get((clsIndex + 1)
+							% clusterLst.size());
+				}
+				// Check 5%: Keep track of original status of user
+				this.errUsrClsMap.put(chosenUsr, cls);
+				this.errUsrSet.add(chosenUsr);
+				this.clusterMap.get(cls).remove(chosenUsrIndex);
+				// addSpecMap(Environment.clusterExtraMap, chosenCls,
+				// chosenUsr);
+				// addSpecMap(rmMap, cls, chosenUsr);
+
+				// Change user-cluster Map
+				this.usrClusterMap.put(chosenUsr, chosenCls);
+			}
+		}
+	}
+
 	private void printMap(Map<Integer, List<Integer>> mp) {
 		int count = 0;
 		for (Iterator<Integer> i = mp.keySet().iterator(); i.hasNext();) {
@@ -429,5 +512,13 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	public void setWarmStart(boolean isWarmStart) {
 		this.isWarmStart = isWarmStart;
 		this.warmIter = 0;
+	}
+
+	public boolean isIncludedErr() {
+		return includedErr;
+	}
+
+	public void setIncludedErr(boolean includedErr) {
+		this.includedErr = includedErr;
 	}
 }
