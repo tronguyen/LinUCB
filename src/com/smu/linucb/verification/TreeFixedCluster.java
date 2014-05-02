@@ -1,6 +1,9 @@
 package com.smu.linucb.verification;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import weka.clusterers.SimpleKMeans;
 import weka.core.Attribute;
@@ -8,10 +11,11 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import com.smu.control.ALGControl;
+import com.smu.control.AlgorithmThreadBuilder;
 import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalFunction;
 import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.preprocessing.Dbconnection;
 
@@ -19,7 +23,7 @@ import com.smu.linucb.preprocessing.Dbconnection;
  * 1: K-mean to cluster users
  * 2: Apply LinUCB_SIN with fixed clusters
  */
-public class TreeFixedCluster extends ALGControl {
+public class TreeFixedCluster extends AlgorithmThreadBuilder {
 	private static SimpleKMeans kmean;
 	private static Instances dataset;
 	private boolean warmStart;
@@ -48,6 +52,7 @@ public class TreeFixedCluster extends ALGControl {
 		Instance instance;
 		List<Integer> lsTrueBM;
 		Attribute attr = null;
+		int cluster, user;
 		try {
 			getKmean().setNumClusters(Environment.numCluster);
 			FastVector attrs = new FastVector();
@@ -66,6 +71,12 @@ public class TreeFixedCluster extends ALGControl {
 			}
 			getKmean().buildClusterer(getDataset());
 
+			// Instances centroids = kmean.getClusterCentroids();
+			// for (int i = 0; i < centroids.numInstances(); i++) {
+			// System.out.println(centroids.instance(i).dataset()
+			// .numInstances());
+			// }
+
 			// Put users into their cluster
 			for (int i = 0; i < getDataset().numInstances(); i++) {
 				// System.out.print((getDataset().instance(i)));
@@ -73,8 +84,10 @@ public class TreeFixedCluster extends ALGControl {
 				// System.out.print(getKmean().clusterInstance(
 				// getDataset().instance(i))
 				// + 1 + "\n");
-				Environment.usrClusterMap.put(Environment.userLst.get(i),
-						getKmean().clusterInstance(getDataset().instance(i)));
+				user = Environment.userLst.get(i);
+				cluster = getKmean().clusterInstance(getDataset().instance(i));
+				Environment.usrClusterMap.put(user, cluster);
+				GlobalFunction.addValueMap(Environment.clusterMap, cluster, user);
 			}
 
 		} catch (Exception e) {
@@ -83,19 +96,61 @@ public class TreeFixedCluster extends ALGControl {
 		}
 	}
 
+
+	public static void genSyntheticData() {
+		List<Integer> clusterLst = new ArrayList<Integer>(
+				Environment.clusterMap.keySet());
+		// Map<Integer, List<Integer>> rmMap = new HashMap<Integer,
+		// List<Integer>>();
+		Random r = new Random();
+		int lenClus = 0, lenRun = 0;
+		int chosenUsr, chosenUsrIndex, chosenCls, clsIndex;
+		for (int cls : clusterLst) {
+			lenClus = (int) (Environment.clusterMap.get(cls).size() * Environment.percentExchange);
+			lenRun = lenClus;
+			// pick random 5% items
+			for (int k = 0; k < lenClus; k++) {
+				// pick randomly one user in cluster
+				chosenUsrIndex = r.nextInt(lenRun--);
+				chosenUsr = Environment.clusterMap.get(cls).get(chosenUsrIndex);
+				// pick randomly cluster to push the user in
+				clsIndex = r.nextInt(clusterLst.size());
+				chosenCls = clusterLst.get(clsIndex);
+				if (chosenCls == cls) {
+					chosenCls = clusterLst.get((clsIndex + 1)
+							% clusterLst.size());
+				}
+				// Check 5%: Keep track of original status of user
+				Environment.errUsrClsMap.put(chosenUsr, cls);
+				Environment.errUsrSet.add(chosenUsr);
+				Environment.clusterMap.get(cls).remove(chosenUsrIndex);
+				// addSpecMap(Environment.clusterExtraMap, chosenCls,
+				// chosenUsr);
+				// addSpecMap(rmMap, cls, chosenUsr);
+
+				// Change user-cluster Map
+				Environment.usrClusterMap.put(chosenUsr, chosenCls);
+			}
+		}
+	}
+
 	@Override
 	public void run() {
 		LinUCB_TREE alg;
 		// Enable fixedCluster mode --> true
 		alg = new LinUCB_TREE();
+		alg.setInClass(this.getInClass());
 		if (!this.warmStart) {
 			alg.setFixedCluster(true);
 			alg.setAlgType(AlgorithmType.LINUCB_VER);
 		} else {
 			alg.setWarmStart(true);
 			alg.setAlgType(AlgorithmType.LINUCB_WARM);
+			// Make noise original data
+//			genSyntheticData();
 		}
 		alg.start();
+		this.interrupt();
 	}
 
 	public static SimpleKMeans getKmean() {

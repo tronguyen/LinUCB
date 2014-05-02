@@ -3,6 +3,7 @@ package com.smu.linucb.preprocessing;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.smu.linucb.global.Environment;
-import com.smu.linucb.global.GlobalSQLQuery;
+import com.smu.linucb.global.GlobalFunction;
 import com.smu.linucb.pca.PrincipleComponentAnalysis;
 
 public class Preprocessing {
@@ -375,6 +376,28 @@ public class Preprocessing {
 		}
 	}
 
+	public static void buildContactRelation(File f) {
+		BufferedReader br = null;
+		String l = "";
+		String[] s;
+		try {
+			br = new BufferedReader(new FileReader(f));
+			br.readLine();
+			while ((l = br.readLine()) != null) {
+				s = l.split("\t");
+				GlobalFunction.addValueMap(Environment.usrRelationMap,
+						Integer.valueOf(s[0]), Integer.valueOf(s[1]));
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		// Preprocessing pr = new Preprocessing();
