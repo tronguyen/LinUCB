@@ -47,7 +47,7 @@ public class MiniFunc {
 				+ "_merged_" + Environment.alphaUCB)));
 		for (Iterator<Integer> it = res.keySet().iterator(); it.hasNext();) {
 			iter = it.next();
-			bw.write(iter + "|" + res.get(iter) / Environment.numAvgLoop + "\n");
+			bw.write(iter + "\t" + res.get(iter) / Environment.numAvgLoop + "\n");
 		}
 		bw.flush();
 		bw.close();
