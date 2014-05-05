@@ -104,7 +104,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 		alg = new LinUCB_TREE();
 		alg.setInClass(this.getInClass());
 		// Make noise original data
-		alg.setIncludedErr(true);
+//		alg.setIncludedErr(true);
 		if (!this.warmStart) {
 			alg.setFixedCluster(true);
 			alg.setAlgType(AlgorithmType.LINUCB_VER);

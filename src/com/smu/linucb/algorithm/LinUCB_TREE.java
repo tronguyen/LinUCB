@@ -133,12 +133,12 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 							cur = UCB1.impl(usr, cur);
 						}
 						// Checking: Reward User after Warm-Step
-						// if (!Environment.rwUserAfterWarm.containsKey(usr)) {
-						// Environment.rwUserAfterWarm
-						// .put(usr, this.leavesTree.get(this.userLeafMap
-						// .get(usr)).payoffMap.get(usr)
-						// .getPayoff());
-						// }
+//						if (!Environment.rwUserAfterWarm.containsKey(usr)) {
+//							Environment.rwUserAfterWarm.put(usr,
+//									this.leavesTree.get(this.userLeafMap
+//											.get(usr)).payoffMap.get(usr)
+//											.getPayoff());
+//						}
 
 						// Increase num of hits (users err-switched)
 						// this.hitBranch++;
