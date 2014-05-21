@@ -92,7 +92,8 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 	@Override
 	public void run() {
 		if (this.isIncludedErr()) {
-			this.genSyntheticData();
+//			this.genSyntheticData();
+			this.genSyntheticData4NegUsr();
 		}
 
 		int usr;
@@ -133,12 +134,12 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 							cur = UCB1.impl(usr, cur);
 						}
 						// Checking: Reward User after Warm-Step
-//						if (!Environment.rwUserAfterWarm.containsKey(usr)) {
-//							Environment.rwUserAfterWarm.put(usr,
-//									this.leavesTree.get(this.userLeafMap
-//											.get(usr)).payoffMap.get(usr)
-//											.getPayoff());
-//						}
+						// if (!Environment.rwUserAfterWarm.containsKey(usr)) {
+						// Environment.rwUserAfterWarm.put(usr,
+						// this.leavesTree.get(this.userLeafMap
+						// .get(usr)).payoffMap.get(usr)
+						// .getPayoff());
+						// }
 
 						// Increase num of hits (users err-switched)
 						// this.hitBranch++;
@@ -447,6 +448,20 @@ public class LinUCB_TREE extends AlgorithmThreadBuilder {
 		System.out.println("  Element Averaged Recall = "
 				+ score.b3ElementRecall());
 		System.out.println("  Element Averaged F(1) = " + score.b3ElementF());
+	}
+
+	public void genSyntheticData4NegUsr() {
+		File f = new File("Output4Stats/negativeUser.txt");
+		String s = "";
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(f));
+			while ((s = br.readLine()) != null) {
+				this.errUsrSet.add(Integer.valueOf(s));
+			}
+			br.close();
+		} catch (Exception ex) {
+			System.out.println("Exception at gen error data 4 negative users");
+		}
 	}
 
 	public void genSyntheticData() {
