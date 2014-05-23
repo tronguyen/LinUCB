@@ -3,7 +3,9 @@ package com.smu.linucb.algorithm;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.ejml.data.DenseMatrix64F;
@@ -16,6 +18,42 @@ import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.preprocessing.Dbconnection;
 
+class IndItem {
+	private SimpleMatrix M = null;
+	private SimpleMatrix b = null;
+	private int clusterIndex = -1;
+
+	public IndItem(int clusterIdx) {
+		M = SimpleMatrix.identity(Environment.featureSize);
+		b = new SimpleMatrix(Environment.featureSize, 1);
+		clusterIndex = clusterIdx;
+	}
+
+	public SimpleMatrix getM() {
+		return M;
+	}
+
+	public void setM(SimpleMatrix m) {
+		M = m;
+	}
+
+	public SimpleMatrix getB() {
+		return b;
+	}
+
+	public void setB(SimpleMatrix b) {
+		this.b = b;
+	}
+
+	public int getClusterIndex() {
+		return clusterIndex;
+	}
+
+	public void setClusterIndex(int clusterIndex) {
+		this.clusterIndex = clusterIndex;
+	}
+}
+
 public class LinUCB extends ALGControl {
 
 	private Dbconnection dbconn;
@@ -25,7 +63,6 @@ public class LinUCB extends ALGControl {
 	private SimpleMatrix theta;
 	private DenseMatrix64F X;
 	private List<Integer> bmLst;
-	
 
 	private int user;
 	private double payoff = 0;
@@ -50,7 +87,7 @@ public class LinUCB extends ALGControl {
 		X = new DenseMatrix64F(Environment.featureSize,
 				Environment.numContextVecs);
 		bmLst = new ArrayList<Integer>();
-		
+
 		dbconn = Dbconnection._getConn();
 	}
 
@@ -148,6 +185,91 @@ public class LinUCB extends ALGControl {
 			M = M.plus(suggestedBMVec.mult(suggestedBMVec.transpose()));
 			CommonOps.scale(payoff, suggestedBMVec.getMatrix());
 			b = b.plus(suggestedBMVec);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	protected void implICML(Set<Integer> itemSet,
+			Map<Integer, IndItem> userItemMap, int time) {
+		try {
+			// Pick randomly 1 true-bookmark
+			List<Integer> lsTrueBM = dbconn.getBookmark4User(
+					GlobalSQLQuery.GETBM4USER, this.getUser());
+
+			int selectedBM = lsTrueBM.get(rBM.nextInt(lsTrueBM.size()));
+			Double[] seletedBMVal = Environment.normMatrix.get(selectedBM);
+			addSample(seletedBMVal);
+			bmLst.add(selectedBM);
+
+			// Pick 24 vectors
+			int randBM;
+			for (int i = 0; i < Environment.numContextVecs - 1; i++) {
+				randBM = genRandomBM(selectedBM);
+				addSample(Environment.normMatrix.get(randBM));
+				bmLst.add(randBM);
+			}
+
+			// Core LINUCB
+			SimpleMatrix I = SimpleMatrix.identity(Environment.featureSize);
+			SimpleMatrix avgM = SimpleMatrix.identity(Environment.featureSize);
+			SimpleMatrix avgb = new SimpleMatrix(Environment.featureSize, 1);
+			IndItem userIt = null;
+			for (Integer i : itemSet) {
+				userIt = userItemMap.get(i);
+				avgM = avgM.plus(userIt.getM().minus(I));
+				avgb = avgb.plus(userIt.getB());
+			}
+			theta = avgM.invert().mult(avgb);
+			DenseMatrix64F temp = new DenseMatrix64F(
+					Environment.numContextVecs, Environment.featureSize);
+			DenseMatrix64F temp2 = new DenseMatrix64F(
+					Environment.numContextVecs, Environment.numContextVecs);
+			CommonOps.multTransA(X, avgM.invert().getMatrix(), temp);
+			CommonOps.mult(temp, X, temp2);
+			DenseMatrix64F diag = new DenseMatrix64F(1,
+					Environment.numContextVecs);
+			CommonOps.extractDiag(temp2, diag);
+			CommonOps.scale(Math.log(time + 1), diag);
+			// Get square root of diag vector
+			for (int sq = 0; sq < Environment.numContextVecs; sq++) {
+				double sqVal = Environment.alpha * Math.sqrt(diag.get(sq));
+				diag.set(sq, sqVal);
+			}
+
+			// Matrix result with each column corresponding to each bookmark
+			SimpleMatrix p = theta.transpose().mult(SimpleMatrix.wrap(X))
+					.plus(SimpleMatrix.wrap(diag));
+			double max = Double.NEGATIVE_INFINITY;
+			int resBM = 0, k = 0;
+			// Suggest bookmark (k value) for user
+			for (k = 0; k < Environment.numContextVecs; k++) {
+				if (max < p.getMatrix().get(k)) {
+					resBM = this.bmLst.get(k);
+					max = p.getMatrix().get(k);
+				}
+			}
+			// System.out.println("---BM list: "
+			// + Arrays.toString(this.bmLst.toArray()));
+			// System.out.println("---Suggestion: " + resBM);
+			// System.out.println("---True BM: " + selectedBM);
+			/*
+			 * Compare with user's choice 1: for right one; -1/24: for wrong one
+			 */
+
+			payoff = (resBM == selectedBM) ? Environment.payoffRight
+					: Environment.payoffWrong;
+			// Update matrix M, b
+			Double[] suggestedBM = Environment.normMatrix.get(resBM);
+			SimpleMatrix suggestedBMVec = SimpleMatrix.wrap(new DenseMatrix64F(
+					Environment.featureSize, 1, true, ArrayUtils
+							.toPrimitive(suggestedBM)));
+			userIt = userItemMap.get(this.getUser());
+			userIt.setM(userIt.getM().plus(
+					suggestedBMVec.mult(suggestedBMVec.transpose())));
+			CommonOps.scale(payoff, suggestedBMVec.getMatrix());
+			userIt.setB(userIt.getB().plus(suggestedBMVec));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

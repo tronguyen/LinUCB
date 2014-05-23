@@ -22,14 +22,15 @@ public class Environment {
 	public static Map<Integer, Integer> usrClusterMap = new HashMap<Integer, Integer>();
 
 	// Config for LinUCB TREE
-	public static int numCluster = 64;
-	public static int numBranch = 4;
+	public static int numCluster = 16;
+	public static int numBranch = 16;
 
 	// Config parameters
 	public static int featureSize = 25;
 	public static int numContextVecs = 25;
 	public static double delta = 0.5;
 	public static double alpha = 1 + Math.sqrt(Math.log(2 / delta) / 2);
+	public static double alphaUCB = 0.1;
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 10000;
