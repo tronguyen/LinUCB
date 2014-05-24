@@ -11,6 +11,7 @@ import java.util.Random;
 import org.jfree.ui.RefineryUtilities;
 
 import com.smu.linucb.algorithm.LinUCB_IND;
+import com.smu.linucb.algorithm.LinUCB_KMEAN;
 import com.smu.linucb.algorithm.LinUCB_SIN;
 import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
@@ -196,6 +197,10 @@ public class ALGControl extends Thread {
 			alg = new TreeFixedCluster(true);
 			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_WARM);
 			break;
+		case LINUCB_KMEAN:
+			alg = new LinUCB_KMEAN();
+			Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_KMEAN);
+			break;
 		}
 		return alg;
 	}
@@ -222,23 +227,27 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
-		alg.start();
+//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
+//		alg.start();
 
 		// Running LinIND
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
-		alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
+		// alg.start();
 
 		// Run LinUCBTREE
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
+//		 alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
+//		 alg.start();
+
+		// Run LinUCB-KMEAN
+		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_KMEAN);
 		alg.start();
 
 		// Running verification && Warmstart
-		TreeFixedCluster.doCluster();
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
-		alg.start();
+		// TreeFixedCluster.doCluster();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_VER);
+		// alg.start();
 
-		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_WARM);
-		alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_WARM);
+		// alg.start();
 	}
 }

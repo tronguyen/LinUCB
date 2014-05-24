@@ -27,7 +27,7 @@ public class LinUCB_TREE extends UCB1 {
 	private Map<Integer, IndItem> userItemMap = new HashMap<Integer, IndItem>();
 	private Map<Integer, Set<Integer>> clusterItemLstMap = new HashMap<Integer, Set<Integer>>();
 	private int indexLeaf = 0;
-
+	private EuclideanDistance ed = new EuclideanDistance();
 	public LinUCB_TREE() {
 		this.setAlgType(AlgorithmType.LINUCB_TREE);
 		this.rClus.setSeed(System.nanoTime() * Thread.currentThread().getId());
@@ -76,7 +76,7 @@ public class LinUCB_TREE extends UCB1 {
 				(int) Math.ceil((Math.log(Environment.numCluster) / Math
 						.log(Environment.numBranch))));
 		int oldIdx;
-		for (int i = 1; i < Environment.limitTime; i++) {
+		for (int i = 1; i <= Environment.limitTime; i++) {
 			// Pick user randomly
 			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
 					.size()));
@@ -114,9 +114,10 @@ public class LinUCB_TREE extends UCB1 {
 					if (!this.isWarmStart()) {
 						cur = this.leavesTree.get(this.rClus
 								.nextInt(Environment.numCluster));
-
 						this.userItemMap.put(usr,
 								new IndItem(cur.getIndexLeaf()));
+						GlobalFunction.addValueMap(this.clusterItemLstMap,
+								cur.getIndexLeaf(), usr);
 					} else {
 						cur = this.leavesTree.get(Environment.usrClusterMap
 								.get(usr));
@@ -165,9 +166,9 @@ public class LinUCB_TREE extends UCB1 {
 		}
 		CommonOps.scale((double) 1 / clusterSize, avgVector.getMatrix());
 		avgCB = avgCB / clusterSize;
-		EuclideanDistance ed = new EuclideanDistance();
-		if (ed.compute(GlobalFunction.convert2DoubleArr(userVector),
-				GlobalFunction.convert2DoubleArr(avgVector)) > userCB + avgCB) {
+		
+		if (this.ed.compute(GlobalFunction.convert2DoubleArr(userVector),
+				GlobalFunction.convert2DoubleArr(avgVector)) > 0.7 * (userCB + avgCB)) {
 			check = true;
 		}
 		return check;

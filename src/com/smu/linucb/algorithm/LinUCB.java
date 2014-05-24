@@ -2,9 +2,9 @@ package com.smu.linucb.algorithm;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -13,7 +13,6 @@ import org.ejml.ops.CommonOps;
 import org.ejml.simple.SimpleMatrix;
 
 import com.smu.control.ALGControl;
-import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.preprocessing.Dbconnection;
@@ -250,10 +249,10 @@ public class LinUCB extends ALGControl {
 					max = p.getMatrix().get(k);
 				}
 			}
-			// System.out.println("---BM list: "
-			// + Arrays.toString(this.bmLst.toArray()));
-			// System.out.println("---Suggestion: " + resBM);
-			// System.out.println("---True BM: " + selectedBM);
+			System.out.println("---BM list: "
+					+ Arrays.toString(this.bmLst.toArray()));
+			System.out.println("---Suggestion: " + resBM);
+			System.out.println("---True BM: " + selectedBM);
 			/*
 			 * Compare with user's choice 1: for right one; -1/24: for wrong one
 			 */

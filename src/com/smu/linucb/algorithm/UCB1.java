@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ejml.simple.SimpleMatrix;
+
 import com.smu.control.ALGControl;
 import com.smu.linucb.global.Environment;
 
@@ -42,6 +44,7 @@ public class UCB1 extends ALGControl {
 	public UCB1 pNode = null; // parent node
 	public UCB1 cNode = null; // child node
 	public LinUCB linucb = null;
+	public SimpleMatrix centroid = null;
 	private int indexLeaf;
 
 	public UCB1(UCB1 pNode) {
