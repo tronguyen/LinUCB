@@ -44,6 +44,7 @@ public class DrawChart extends JFrame {
 	XYSeries xyLinUCB_VER;
 	XYSeries xyLinUCB_WARM;
 	XYSeries xyLinUCB_KMEAN;
+	
 
 	public DrawChart(final String title) {
 		super(title);

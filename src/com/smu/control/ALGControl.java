@@ -226,21 +226,22 @@ public class ALGControl extends Thread {
 		Environment.drChart.setVisible(true);
 
 		ALGControl alg;
-		// Running LinSIN
-//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
-//		alg.start();
 
 		// Running LinIND
 		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_IND);
 		// alg.start();
 
 		// Run LinUCBTREE
-//		 alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
-//		 alg.start();
+		// alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_TREE);
+		// alg.start();
 
 		// Run LinUCB-KMEAN
 		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_KMEAN);
 		alg.start();
+
+		// Running LinSIN
+//		alg = ALGControl.factoryInstanceAlg(AlgorithmType.LINUCB_SIN);
+//		alg.start();
 
 		// Running verification && Warmstart
 		// TreeFixedCluster.doCluster();

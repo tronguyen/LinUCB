@@ -28,6 +28,7 @@ public class LinUCB_TREE extends UCB1 {
 	private Map<Integer, Set<Integer>> clusterItemLstMap = new HashMap<Integer, Set<Integer>>();
 	private int indexLeaf = 0;
 	private EuclideanDistance ed = new EuclideanDistance();
+
 	public LinUCB_TREE() {
 		this.setAlgType(AlgorithmType.LINUCB_TREE);
 		this.rClus.setSeed(System.nanoTime() * Thread.currentThread().getId());
@@ -152,8 +153,8 @@ public class LinUCB_TREE extends UCB1 {
 		int clusterIdx = this.userItemMap.get(usr).getClusterIndex();
 		int clusterSize = this.clusterItemLstMap.get(clusterIdx).size();
 		UCB1 cluster = this.leavesTree.get(clusterIdx);
-		double userCB = calConfidenceBound(usr, cluster.payoffMap.get(usr)
-				.getVisit());
+		int visits = cluster.payoffMap.get(usr).getVisit(), totalVisits = visits;
+		double userCB = calConfidenceBound(usr, visits);
 		double avgCB = userCB;
 
 		for (int uItem : this.clusterItemLstMap.get(clusterIdx)) {
@@ -161,14 +162,16 @@ public class LinUCB_TREE extends UCB1 {
 				continue;
 			u = this.userItemMap.get(uItem);
 			avgVector = avgVector.plus(u.getM().invert().mult(u.getB()));
-			avgCB += calConfidenceBound(uItem, cluster.payoffMap.get(uItem)
-					.getVisit());
+			visits = cluster.payoffMap.get(uItem).getVisit();
+			avgCB += calConfidenceBound(uItem, visits);
+			totalVisits += visits;
 		}
 		CommonOps.scale((double) 1 / clusterSize, avgVector.getMatrix());
 		avgCB = avgCB / clusterSize;
-		
+		double para = Math.pow(
+				(1 + totalVisits) / (1 + Math.log(1 + totalVisits)), 0.5);
 		if (this.ed.compute(GlobalFunction.convert2DoubleArr(userVector),
-				GlobalFunction.convert2DoubleArr(avgVector)) > 0.7 * (userCB + avgCB)) {
+				GlobalFunction.convert2DoubleArr(avgVector)) >  (userCB + avgCB)) {
 			check = true;
 		}
 		return check;
