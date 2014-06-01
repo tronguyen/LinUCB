@@ -47,7 +47,8 @@ public class LinUCB_IND extends LinUCB {
 			r.run_nonthread();
 			this.rewardTotal += r.getPayoff();
 			// Draw chart
-			this.displayResult(i, this.rewardTotal);
+//			this.displayResult(i, this.rewardTotal);
+			this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 		}
 		this.interrupt();
 	}
