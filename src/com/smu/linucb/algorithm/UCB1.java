@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
+import org.ejml.simple.SimpleMatrix;
 
 import com.smu.linucb.global.Environment;
 
@@ -45,6 +45,7 @@ public class UCB1 {
 	public UCB1 pNode = null; // parent node
 	public UCB1 cNode = null; // child node
 	public LinUCB linucb = null;
+	public SimpleMatrix centroid = null;
 	private int indexLeaf;
 	private static Mean mean = new Mean();
 	private static Variance var = new Variance();

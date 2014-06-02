@@ -43,6 +43,7 @@ public class DrawChart extends JFrame {
 	XYSeries xyLinUCB_TREE;
 	XYSeries xyLinUCB_VER;
 	XYSeries xyLinUCB_WARM;
+	XYSeries xyLinUCB_KMEAN;
 
 	public DrawChart(final String title) {
 		super(title);
@@ -67,6 +68,9 @@ public class DrawChart extends JFrame {
 			break;
 		case LINUCB_WARM:
 			xyLinUCB_WARM.add(x, y);
+			break;
+		case LINUCB_KMEAN:
+			xyLinUCB_KMEAN.add(x, y);
 			break;
 		default:
 			break;
@@ -94,6 +98,10 @@ public class DrawChart extends JFrame {
 		case LINUCB_WARM:
 			xyLinUCB_WARM = new XYSeries("LINUCB_WARM");
 			dataset.addSeries(xyLinUCB_WARM);
+			break;
+		case LINUCB_KMEAN:
+			xyLinUCB_KMEAN = new XYSeries("LINUCB_KMEAN");
+			dataset.addSeries(xyLinUCB_KMEAN);
 			break;
 		default:
 			break;
@@ -165,7 +173,7 @@ public class DrawChart extends JFrame {
 		// axis.setFixedAutoRange(2000.0);
 		axis = plot.getRangeAxis();
 		// axis.setRange(-50.0, 250.0);
-		axis.setRange(-50, 600.0);
+		axis.setRange(-50, 250.0);
 		return chart;
 
 	}

@@ -43,7 +43,7 @@ public class Environment {
 	public static double alphaUCB = Math.pow(10, -1); //Fixed 0.1 for best
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
-	public static int limitTime = 50000;
+	public static int limitTime = 25000;
 	public static int numAvgLoop = 1; // Number of thread for each algorithm
 	public static int buffSizeDisplay = 10;
 	public static double percentExchange = 0.1; 

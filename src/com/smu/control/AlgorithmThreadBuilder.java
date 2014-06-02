@@ -1,13 +1,13 @@
 package com.smu.control;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import com.smu.linucb.algorithm.LinUCB_IND;
+import com.smu.linucb.algorithm.LinUCB_KMEAN;
 import com.smu.linucb.algorithm.LinUCB_SIN;
 import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
@@ -99,6 +99,10 @@ public class AlgorithmThreadBuilder extends ALGControl {
 			alg = new TreeFixedCluster(true);
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_WARM);
 			break;
+		case LINUCB_KMEAN:
+			alg = new LinUCB_KMEAN();
+			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_KMEAN);
+			break;
 		}
 		return alg;
 	}
@@ -118,10 +122,12 @@ public class AlgorithmThreadBuilder extends ALGControl {
 			if (this.getRewardIndex().size() != 0) {
 				time = this.getRewardIndex().get(0);
 				if (this.getRewardMonitor().get(time).getCount() == Environment.numAvgLoop) {
-					rewardDisplay = this.getRewardMonitor().get(time).getReward()
+					rewardDisplay = this.getRewardMonitor().get(time)
+							.getReward()
 							/ Environment.numAvgLoop;
 					this.displayResult(time, rewardDisplay);
-					System.out.println("Time: " + time + " Reward: " + rewardDisplay);
+//					System.out.println("Time: " + time + " Reward: "
+//							+ rewardDisplay);
 				}
 				this.getRewardIndex().remove(0);
 				if (time == Environment.limitTime) {
@@ -139,8 +145,8 @@ public class AlgorithmThreadBuilder extends ALGControl {
 		}
 	}
 
-	protected synchronized void updateRewardMap(AlgorithmThreadBuilder rwMap, int count,
-			double rw) {
+	protected synchronized void updateRewardMap(AlgorithmThreadBuilder rwMap,
+			int count, double rw) {
 		// int index;
 		RewardUpdate ru;
 		if ((count % Environment.buffSizeDisplay) == 0) {
@@ -158,7 +164,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 				rwMap.getRewardIndex().add(count);
 				// Collections.sort(rwMap.rewardIndex);
 			}
-//			rwMap.getRewardMonitor().put(count, ru);
+			// rwMap.getRewardMonitor().put(count, ru);
 		}
 	}
 

@@ -165,11 +165,15 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
-		// alg.start();
+		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
+		 alg.start();
 
 		// Running LinIND
-		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
+		// alg.start();
+
+		// Running LinUCB-Kmean
+		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
 		alg.start();
 
 		// Run LinUCBTREE
