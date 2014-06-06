@@ -1,5 +1,9 @@
 package com.smu.linucb.algorithm;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,6 +27,7 @@ public class LinUCB_IND extends LinUCB {
 		LinUCB_IND_impl ucb = LinUCB_IND.banditLst.get(usr);
 		if (ucb == null) {
 			ucb = new LinUCB_IND_impl(usr);
+			LinUCB_IND.banditLst.put(usr, ucb);
 		}
 		return ucb;
 	}
@@ -37,18 +42,30 @@ public class LinUCB_IND extends LinUCB {
 	public void run() {
 		int usr;
 		LinUCB_IND_impl r;
-		// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
-		for (int i = 1; i <= Environment.limitTime; i++) {
-			// Pick user randomly
-			usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
-					.size()));
-			// System.out.println("User: " + usr);
-			r = LinUCB_IND.getUserBandit(usr);
-			r.run_nonthread();
-			this.rewardTotal += r.getPayoff();
-			// Draw chart
-//			this.displayResult(i, this.rewardTotal);
-			this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
+					outputFile + this.getAlgType())));
+			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
+			for (int i = 1; i <= Environment.limitTime; i++) {
+				// Pick user randomly
+				usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
+						.size()));
+				// System.out.println("User: " + usr);
+				r = LinUCB_IND.getUserBandit(usr);
+				r.run_nonthread();
+				this.rewardTotal += r.getPayoff();
+				// Draw chart
+				// this.displayResult(i, this.rewardTotal);
+				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+				if ((i % Environment.buffSizeDisplay) == 0) {
+					bw.write(i + "\t" + this.rewardTotal + "\n");
+				}
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		this.interrupt();
 	}

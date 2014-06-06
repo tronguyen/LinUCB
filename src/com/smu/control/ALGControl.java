@@ -15,12 +15,11 @@ import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.pca.PrincipleComponentAnalysis;
 import com.smu.linucb.preprocessing.Dbconnection;
 import com.smu.linucb.preprocessing.Preprocessing;
-import com.smu.linucb.verification.TreeFixedCluster;
+import com.smu.linucb.preprocessing.Preprocessing_lastfm;
 
 public class ALGControl extends Thread {
 
-	static File fMatrix = new File("norm_matrix_ejml_full");
-
+	protected String outputFile = GlobalSQLQuery.outputFile;
 	/**
 	 * @param args
 	 */
@@ -30,7 +29,8 @@ public class ALGControl extends Thread {
 		int bmid;
 		Double[] tagVals;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(fMatrix));
+			BufferedReader br = new BufferedReader(new FileReader(
+					GlobalSQLQuery.fMatrix));
 			while ((line = br.readLine()) != null) {
 				arrStr = line.split(",");
 				bmid = Integer.parseInt(arrStr[0]);
@@ -51,7 +51,7 @@ public class ALGControl extends Thread {
 		}
 	}
 
-	public static void initData4LinUCB(Preprocessing pr) {
+	public static void initData4Delicious(Preprocessing pr) {
 		// Preprocessing pr = new Preprocessing();
 		Dbconnection dbconn = Dbconnection._getConn();
 		try {
@@ -89,6 +89,28 @@ public class ALGControl extends Thread {
 			// "bm_index_try_1"));
 		} catch (SQLException sqlEx) {
 			System.out.println("SQL exception...");
+		}
+	}
+
+	public static void initData4LastFM(Preprocessing_lastfm pr) {
+		Dbconnection dbconn = Dbconnection._getConn();
+		try {
+			// Build tag set for counting
+			pr.buildTags(dbconn.getResultSet(GlobalSQLQuery.GETVIEW_ARTIST_TAG));
+
+			System.out.println("Tags: " + Environment.hm_tag_artistset.size());
+			System.out.println("Artist: " + Environment.hm_artist_tag.size());
+			// Running PCA
+			// executePCAFM(pr);
+			// Calculate TF-IDF & normalization
+			// pr.calTF_IDF();
+
+			// pr.writeBookmark_Tags(new File("Output4Stats/matrix4lastfm"));
+		} catch (SQLException sqlEx) {
+			System.out.println("SQL exception...");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -143,18 +165,56 @@ public class ALGControl extends Thread {
 		pr.writeNormMatrix(pca, mxIN, mxOUT);
 	}
 
+	public static void executePCAFM(Preprocessing_lastfm pr) throws Exception {
+		PrincipleComponentAnalysis pca = new PrincipleComponentAnalysis();
+		// int bm_num = 68479;
+		// int tg_num = 11619;
+		pca.setup(Environment.hm_artist_tag.size(),
+				Environment.hm_tag_artistset.size());
+		File mxIN = new File("Output4Stats/matrix4lastfm");
+		File mxOUT = new File("Output4Stats/norm_matrix_ejml_lastfm");
+		BufferedReader br = new BufferedReader(new FileReader(mxIN));
+		String s = "";
+		String[] arrStr;
+		double[] nums = null;
+		System.out.println("Start reading matrix...");
+		while ((s = br.readLine()) != null) {
+			arrStr = s.split("\t");
+			nums = new double[arrStr.length - 1];
+			for (int i = 0; i < nums.length; i++) {
+				nums[i] = Double.parseDouble(arrStr[i + 1]);
+			}
+			pca.addSample(nums);
+		}
+		br.close();
+
+		System.out.println("Start PCA...");
+		pca.computeBasis(Environment.featureSize);
+
+		// Write down to file
+		System.out.println("Start writing norm matrix...");
+		pr.writeNormMatrix(pca, mxIN, mxOUT);
+	}
+
 	@Override
 	public void run() {
 	};
 
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
-		Preprocessing pr = new Preprocessing();
-		// Init data for PCA
-		ALGControl.initData4LinUCB(pr);
-		// Get users from db
+
+//		Preprocessing pr = new Preprocessing();
+//		// Init data for PCA
+//		ALGControl.initData4Delicious(pr);
+//		// Get users from db
+//		pr.buildUserList(Dbconnection._getConn().getResultSet(
+//				GlobalSQLQuery.GETUSER));
+
+		Preprocessing_lastfm pr = new Preprocessing_lastfm();
+		ALGControl.initData4LastFM(pr);
 		pr.buildUserList(Dbconnection._getConn().getResultSet(
 				GlobalSQLQuery.GETUSER));
+
 		// Read norm matrix from file outside
 		ALGControl.readMatrix();
 
@@ -165,12 +225,12 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
-		 alg.start();
+//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
+//		 alg.start();
 
 		// Running LinIND
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
-		// alg.start();
+//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
+//		 alg.start();
 
 		// Running LinUCB-Kmean
 		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
@@ -179,6 +239,18 @@ public class ALGControl extends Thread {
 		// Run LinUCBTREE
 		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
 		// alg.start();
+		// double bigRW = Double.NEGATIVE_INFINITY, trueAlphaICML = 0;
+		// for (double k = 0.03; k < 1; k += 0.03) {
+		// Environment.alphaICML = k;
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
+		// alg.start();
+		// if (alg.getRewardTotal() > bigRW) {
+		// bigRW = alg.getRewardTotal();
+		// trueAlphaICML = k;
+		// }
+		// System.out.println("RW: " + bigRW + " --- k: " + k);
+		// }
+		// System.out.println("True Value: " + trueAlphaICML);
 
 		// Running verification && Warmstart
 		// TreeFixedCluster.doCluster();

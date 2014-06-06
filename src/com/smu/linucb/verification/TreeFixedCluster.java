@@ -65,7 +65,7 @@ public class TreeFixedCluster extends AlgorithmThreadBuilder {
 			// Build instances
 			for (int usr : Environment.userLst) {
 				lsTrueBM = Dbconnection._getConn().getBookmark4User(
-						GlobalSQLQuery.GETBM4USER, usr);
+						GlobalSQLQuery.GETSUGGESTION4USER, usr);
 				instance = createInstance(lsTrueBM);
 				getDataset().add(instance);
 			}

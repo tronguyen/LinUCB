@@ -44,6 +44,7 @@ public class DrawChart extends JFrame {
 	XYSeries xyLinUCB_VER;
 	XYSeries xyLinUCB_WARM;
 	XYSeries xyLinUCB_KMEAN;
+	XYSeries xyCLUB;
 
 	public DrawChart(final String title) {
 		super(title);
@@ -71,6 +72,9 @@ public class DrawChart extends JFrame {
 			break;
 		case LINUCB_KMEAN:
 			xyLinUCB_KMEAN.add(x, y);
+			break;
+		case CLUB:
+			xyCLUB.add(x, y);
 			break;
 		default:
 			break;
@@ -102,6 +106,10 @@ public class DrawChart extends JFrame {
 		case LINUCB_KMEAN:
 			xyLinUCB_KMEAN = new XYSeries("LINUCB_KMEAN");
 			dataset.addSeries(xyLinUCB_KMEAN);
+			break;
+		case CLUB:
+			xyCLUB = new XYSeries("CLUB");
+			dataset.addSeries(xyCLUB);
 			break;
 		default:
 			break;
@@ -165,15 +173,18 @@ public class DrawChart extends JFrame {
 		// OPTIONAL CUSTOMISATION COMPLETED.
 
 		final XYPlot plot = chart.getXYPlot();
-		plot.setBackgroundPaint(Color.lightGray);
+		plot.setBackgroundPaint(Color.white);
+		plot.setDomainGridlinePaint(Color.lightGray);
+		plot.setRangeGridlinePaint(Color.lightGray);
 		// plot.getRenderer().setBaseStroke(new BasicStroke(3));
 		plot.getRenderer().setStroke(new BasicStroke(1.5f));
 		ValueAxis axis = plot.getDomainAxis();
 		axis.setAutoRange(true);
 		// axis.setFixedAutoRange(2000.0);
 		axis = plot.getRangeAxis();
-		// axis.setRange(-50.0, 250.0);
-		axis.setRange(-50, 250.0);
+		axis.setAutoRange(true);
+//		axis.setRange(-50.0, 250.0);
+		// axis.setRange(-50, 600.0);
 		return chart;
 
 	}

@@ -19,7 +19,7 @@ import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
 
-public class LinUCB_KMEAN extends LinUCB {
+public class LinUCB_KMEAN_MOD extends LinUCB {
 
 	private double rewardTotal = 0;
 	private List<Integer> fstTimeUsrLst = new ArrayList<Integer>();
@@ -31,7 +31,7 @@ public class LinUCB_KMEAN extends LinUCB {
 			* Thread.currentThread().getId());
 	private EuclideanDistance edd = new EuclideanDistance();
 
-	public LinUCB_KMEAN() {
+	public LinUCB_KMEAN_MOD() {
 		this.setAlgType(AlgorithmType.LINUCB_KMEAN);
 	}
 
@@ -42,7 +42,7 @@ public class LinUCB_KMEAN extends LinUCB {
 		IndItem u = null;
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					outputFile + this.getAlgType())));
+					outputFile + this.getAlgType() + "_" + Environment.numCluster)));
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 			// TODO Auto-generated method stub
 			for (int i = 1; i <= Environment.limitTime; i++) {
@@ -75,7 +75,7 @@ public class LinUCB_KMEAN extends LinUCB {
 						calPayoff(cur, usr, i);
 
 						// Set centroid for K first users
-						cur.centroid = u.getM().invert().mult(u.getB());
+						cur.centroid = u.getTheta();
 					} else {
 						cur = this.clusterLst.get(this.rClus
 								.nextInt(Environment.numCluster));
@@ -86,7 +86,7 @@ public class LinUCB_KMEAN extends LinUCB {
 								cur.getIndexLeaf(), usr);
 						calPayoff(cur, usr, i);
 						SimpleMatrix uMx = u.getM().invert().mult(u.getB());
-						updateCentroid(uMx, cur, usr);
+						updateCentroid(uMx, cur, usr, true);
 					}
 				}
 				// Draw chart
@@ -110,11 +110,14 @@ public class LinUCB_KMEAN extends LinUCB {
 		UCB1 chosenCls = null;
 		double minDistance = Double.POSITIVE_INFINITY, tempDistance;
 		IndItem uItem = this.userItemMap.get(usr);
-		SimpleMatrix uMx = uItem.getM().invert().mult(uItem.getB()), avgVector = uMx;
+		SimpleMatrix uMx = uItem.getTheta(), uMxOld = uItem.getThetaOld();
+		int clsSize;
 		for (UCB1 cls : this.clusterLst) {
-			tempDistance = this.edd.compute(
-					GlobalFunction.convert2DoubleArr(uMx),
-					GlobalFunction.convert2DoubleArr(cls.centroid));
+			clsSize = this.clusterItemLstMap.get(cls.getIndexLeaf()).size();
+			tempDistance = this.edd.compute(GlobalFunction
+					.convert2DoubleArr(uMx),
+					GlobalFunction.convert2DoubleArr(cls.centroid
+							.scale((double) 1 / clsSize)));
 			if (tempDistance < minDistance) {
 				minDistance = tempDistance;
 				chosenCls = cls;
@@ -122,33 +125,37 @@ public class LinUCB_KMEAN extends LinUCB {
 		}
 
 		int clusterIdx = chosenCls.getIndexLeaf();
+		int clusterIdxOld = uItem.getClusterIndex();
 
 		// Change membership
 		int oldIdx = this.userItemMap.get(usr).getClusterIndex();
 		GlobalFunction.delValueMap(this.clusterItemLstMap, oldIdx, usr);
-		
-		// Update link to new cluster
-		this.userItemMap.get(usr).setClusterIndex(clusterIdx);
-		GlobalFunction.addValueMapSet(this.clusterItemLstMap, clusterIdx, usr);
+		// Update centroid old cluster
+		updateCentroid(uMxOld, this.clusterLst.get(clusterIdxOld), usr, false);
 
-		// Update centroid
-		updateCentroid(avgVector, chosenCls, usr);
+		// Update link to new cluster
+		uItem.setClusterIndex(clusterIdx);
+		GlobalFunction.addValueMapSet(this.clusterItemLstMap, clusterIdx, usr);
+		// Update centroid new cluster
+		updateCentroid(uMx, chosenCls, usr, true);
 
 	}
 
 	// Update cluster's centroid
-	private void updateCentroid(SimpleMatrix avgVector, UCB1 chosenCls, int usr) {
-		IndItem u = null;
-		int clusterIdx = chosenCls.getIndexLeaf();
-		int clusterSize = this.clusterItemLstMap.get(clusterIdx).size();
-		for (int uItemID : this.clusterItemLstMap.get(clusterIdx)) {
-			if (usr == uItemID)
-				continue;
-			u = this.userItemMap.get(uItemID);
-			avgVector = avgVector.plus(u.getM().invert().mult(u.getB()));
-		}
-		CommonOps.scale((double) 1 / clusterSize, avgVector.getMatrix());
-		chosenCls.centroid = avgVector;
+	private void updateCentroid(SimpleMatrix usrVector, UCB1 chosenCls,
+			int usr, boolean newUpdate) {
+		// IndItem u = null;
+		// int clusterIdx = chosenCls.getIndexLeaf();
+		// int clusterSize = this.clusterItemLstMap.get(clusterIdx).size();
+		// for (int uItemID : this.clusterItemLstMap.get(clusterIdx)) {
+		// if (usr == uItemID)
+		// continue;
+		// u = this.userItemMap.get(uItemID);
+		// avgVector = avgVector.plus(u.getTheta());
+		// }
+
+		chosenCls.centroid = (newUpdate) ? (chosenCls.centroid.plus(usrVector))
+				: (chosenCls.centroid.minus(usrVector));
 	}
 
 	private void calPayoff(UCB1 cur, int usr, int times) {

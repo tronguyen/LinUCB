@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.smu.linucb.algorithm.CLUB;
 import com.smu.linucb.algorithm.LinUCB_IND;
-import com.smu.linucb.algorithm.LinUCB_KMEAN;
+import com.smu.linucb.algorithm.LinUCB_KMEAN_MOD;
 import com.smu.linucb.algorithm.LinUCB_SIN;
 import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
@@ -100,7 +101,11 @@ public class AlgorithmThreadBuilder extends ALGControl {
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_WARM);
 			break;
 		case LINUCB_KMEAN:
-			alg = new LinUCB_KMEAN();
+			alg = new LinUCB_KMEAN_MOD();
+			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_KMEAN);
+			break;
+		case CLUB:
+			alg = new CLUB();
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_KMEAN);
 			break;
 		}
@@ -137,7 +142,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 				}
 			}
 			try {
-				Thread.sleep(10);
+				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

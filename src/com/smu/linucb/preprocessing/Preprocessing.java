@@ -54,7 +54,7 @@ public class Preprocessing {
 	}
 
 	// split tag values
-	private Set<String> isSplit(String text) {
+	protected Set<String> isSplit(String text) {
 		Set<String> chk = new HashSet<String>();
 		String patternString = "\\w+[[\\_|\\-|\\^|\\/]\\w+]+";
 		Pattern pattern = Pattern.compile(patternString);
@@ -147,7 +147,7 @@ public class Preprocessing {
 		}
 	}
 
-	private static void addTags(Map<String, Double> obj, String txt, double d) {
+	protected static void addTags(Map<String, Double> obj, String txt, double d) {
 		if (txt.equals("") | txt.matches("^\\?+$")) {
 			return;
 		}
@@ -199,7 +199,7 @@ public class Preprocessing {
 		}
 	}
 
-	private static double normalizeTF_IDF(double numerator, double denominator) {
+	protected static double normalizeTF_IDF(double numerator, double denominator) {
 		return numerator / Math.sqrt(denominator);
 	}
 

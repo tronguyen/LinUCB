@@ -2,6 +2,7 @@ package com.smu.linucb.algorithm;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,11 +21,19 @@ class IndItem {
 	private SimpleMatrix M = null;
 	private SimpleMatrix b = null;
 	private int clusterIndex = -1;
+	private LinUCB linucb = null;
+	private SimpleMatrix MOld = null;
+	private SimpleMatrix bOld = null;
+	private SimpleMatrix theta = null;
+	private SimpleMatrix thetaOld = null;
 
-	public IndItem(int clusterIdx) {
+	public IndItem() {
 		M = SimpleMatrix.identity(Environment.featureSize);
 		b = new SimpleMatrix(Environment.featureSize, 1);
-		clusterIndex = clusterIdx;
+		setMOld(SimpleMatrix.identity(Environment.featureSize));
+		setbOld(new SimpleMatrix(Environment.featureSize, 1));
+		setTheta(new SimpleMatrix(Environment.featureSize, 1));
+		setThetaOld(new SimpleMatrix(Environment.featureSize, 1));
 	}
 
 	public SimpleMatrix getM() {
@@ -50,6 +59,46 @@ class IndItem {
 	public void setClusterIndex(int clusterIndex) {
 		this.clusterIndex = clusterIndex;
 	}
+
+	public LinUCB getLinucb() {
+		return linucb;
+	}
+
+	public void setLinucb(LinUCB linucb) {
+		this.linucb = linucb;
+	}
+
+	public SimpleMatrix getMOld() {
+		return MOld;
+	}
+
+	public void setMOld(SimpleMatrix mOld) {
+		MOld = mOld;
+	}
+
+	public SimpleMatrix getbOld() {
+		return bOld;
+	}
+
+	public void setbOld(SimpleMatrix bOld) {
+		this.bOld = bOld;
+	}
+
+	public SimpleMatrix getTheta() {
+		return theta;
+	}
+
+	public void setTheta(SimpleMatrix theta) {
+		this.theta = theta;
+	}
+
+	public SimpleMatrix getThetaOld() {
+		return thetaOld;
+	}
+
+	public void setThetaOld(SimpleMatrix thetaOld) {
+		this.thetaOld = thetaOld;
+	}
 }
 
 public class LinUCB extends AlgorithmThreadBuilder {
@@ -61,7 +110,8 @@ public class LinUCB extends AlgorithmThreadBuilder {
 	private SimpleMatrix theta;
 	private DenseMatrix64F X;
 	private List<Integer> bmLst;
-	
+
+	private SimpleMatrix I, avgM, avgb;
 
 	private int user;
 	private double payoff = 0;
@@ -82,11 +132,21 @@ public class LinUCB extends AlgorithmThreadBuilder {
 	public LinUCB() {
 		M = SimpleMatrix.identity(Environment.featureSize);
 		b = new SimpleMatrix(Environment.featureSize, 1);
-		theta = SimpleMatrix.identity(Environment.featureSize);
+		theta = new SimpleMatrix(Environment.featureSize, 1);
 		X = new DenseMatrix64F(Environment.featureSize,
 				Environment.numContextVecs);
 		bmLst = new ArrayList<Integer>();
-		
+		dbconn = Dbconnection._getConn();
+	}
+
+	public LinUCB(int mode) {
+		I = SimpleMatrix.identity(Environment.featureSize);
+		avgM = SimpleMatrix.identity(Environment.featureSize);
+		avgb = new SimpleMatrix(Environment.featureSize, 1);
+		theta = new SimpleMatrix(Environment.featureSize, 1);
+		X = new DenseMatrix64F(Environment.featureSize,
+				Environment.numContextVecs);
+		bmLst = new ArrayList<Integer>();
 		dbconn = Dbconnection._getConn();
 	}
 
@@ -94,6 +154,17 @@ public class LinUCB extends AlgorithmThreadBuilder {
 		bmLst.clear();
 		// Reset sample index
 		this.sampleCol = 0;
+		X.zero();
+	}
+
+	public void resetICML() {
+		bmLst.clear();
+		// Reset sample index
+		this.sampleCol = 0;
+		X.zero();
+		avgb.zero();
+		avgM = SimpleMatrix.identity(Environment.featureSize);
+		theta = new SimpleMatrix(Environment.featureSize, 1);
 	}
 
 	private void addSample(Double[] sampleData) {
@@ -122,7 +193,7 @@ public class LinUCB extends AlgorithmThreadBuilder {
 		try {
 			// Pick randomly 1 true-bookmark
 			List<Integer> lsTrueBM = dbconn.getBookmark4User(
-					GlobalSQLQuery.GETBM4USER, this.getUser());
+					GlobalSQLQuery.GETSUGGESTION4USER, this.getUser());
 
 			int selectedBM = lsTrueBM.get(rBM.nextInt(lsTrueBM.size()));
 			Double[] seletedBMVal = Environment.normMatrix.get(selectedBM);
@@ -166,10 +237,10 @@ public class LinUCB extends AlgorithmThreadBuilder {
 					max = p.getMatrix().get(k);
 				}
 			}
-			// System.out.println("---BM list: "
-			// + Arrays.toString(this.bmLst.toArray()));
-			// System.out.println("---Suggestion: " + resBM);
-			// System.out.println("---True BM: " + selectedBM);
+			System.out.println("---BM list: "
+					+ Arrays.toString(this.bmLst.toArray()));
+			System.out.println("---Suggestion: " + resBM);
+			System.out.println("---True BM: " + selectedBM);
 			/*
 			 * Compare with user's choice = 1: for right one = -1: for wrong one
 			 */
@@ -195,7 +266,7 @@ public class LinUCB extends AlgorithmThreadBuilder {
 		try {
 			// Pick randomly 1 true-bookmark
 			List<Integer> lsTrueBM = dbconn.getBookmark4User(
-					GlobalSQLQuery.GETBM4USER, this.getUser());
+					GlobalSQLQuery.GETSUGGESTION4USER, this.getUser());
 
 			int selectedBM = lsTrueBM.get(rBM.nextInt(lsTrueBM.size()));
 			Double[] seletedBMVal = Environment.normMatrix.get(selectedBM);
@@ -211,9 +282,6 @@ public class LinUCB extends AlgorithmThreadBuilder {
 			}
 
 			// Core LINUCB
-			SimpleMatrix I = SimpleMatrix.identity(Environment.featureSize);
-			SimpleMatrix avgM = SimpleMatrix.identity(Environment.featureSize);
-			SimpleMatrix avgb = new SimpleMatrix(Environment.featureSize, 1);
 			IndItem userIt = null;
 			for (Integer i : itemSet) {
 				userIt = userItemMap.get(i);
@@ -249,10 +317,10 @@ public class LinUCB extends AlgorithmThreadBuilder {
 					max = p.getMatrix().get(k);
 				}
 			}
-//			System.out.println("---BM list: "
-//					+ Arrays.toString(this.bmLst.toArray()));
-//			System.out.println("---Suggestion: " + resBM);
-//			System.out.println("---True BM: " + selectedBM);
+			// System.out.println("---BM list: "
+			// + Arrays.toString(this.bmLst.toArray()));
+			// System.out.println("---Suggestion: " + resBM);
+			// System.out.println("---True BM: " + selectedBM);
 			/*
 			 * Compare with user's choice 1: for right one; -1/24: for wrong one
 			 */
@@ -265,17 +333,25 @@ public class LinUCB extends AlgorithmThreadBuilder {
 					Environment.featureSize, 1, true, ArrayUtils
 							.toPrimitive(suggestedBM)));
 			userIt = userItemMap.get(this.getUser());
+
+			// Keep the old value
+			userIt.setMOld(userIt.getM());
+			userIt.setbOld(userIt.getB());
+			userIt.setThetaOld(userIt.getTheta());
+			// Update new value for user
 			userIt.setM(userIt.getM().plus(
 					suggestedBMVec.mult(suggestedBMVec.transpose())));
 			CommonOps.scale(payoff, suggestedBMVec.getMatrix());
 			userIt.setB(userIt.getB().plus(suggestedBMVec));
+			userIt.setTheta(userIt.getM().invert().mult(userIt.getB()));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected double getPayoff() {
 		return this.payoff;
 	}
+
 }
