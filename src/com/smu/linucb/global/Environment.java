@@ -50,7 +50,7 @@ public class Environment {
 	public static double delta = 0.05;
 	public static double alphaLin = 1 + Math.sqrt(Math.log(2 / delta) / 2);
 	public static double alphaUCB = Math.pow(10, -1); // Fixed 0.1 for best
-	public static double alphaICML = 0.85; //Math.pow(10, 0);
+	public static double alphaICML = 0.7; //Math.pow(10, 0);
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 50000;
@@ -72,6 +72,6 @@ public class Environment {
 	public static String RW2FILE_WARM = "Output4Stats/RW2File_WARM/";
 	public static String RW2FILE_VER = "Output4Stats/RW2File_VER/";
 	public static DATASET DATASOURCE = DATASET.DELICIOUS;
-	public static String RUNNINGTIME = "_TIME_1";
+	public static String RUNNINGTIME = "_TIME_2";
 	public static boolean readMode = true;
 }
