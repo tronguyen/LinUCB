@@ -19,7 +19,6 @@ import com.smu.linucb.preprocessing.Preprocessing_lastfm;
 
 public class ALGControl extends Thread {
 
-	protected String outputFile = GlobalSQLQuery.outputFile;
 	/**
 	 * @param args
 	 */
@@ -203,17 +202,17 @@ public class ALGControl extends Thread {
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
 
-//		Preprocessing pr = new Preprocessing();
-//		// Init data for PCA
-//		ALGControl.initData4Delicious(pr);
-//		// Get users from db
-//		pr.buildUserList(Dbconnection._getConn().getResultSet(
-//				GlobalSQLQuery.GETUSER));
-
-		Preprocessing_lastfm pr = new Preprocessing_lastfm();
-		ALGControl.initData4LastFM(pr);
+		Preprocessing pr = new Preprocessing();
+		// Init data for PCA
+		ALGControl.initData4Delicious(pr);
+		// Get users from db
 		pr.buildUserList(Dbconnection._getConn().getResultSet(
 				GlobalSQLQuery.GETUSER));
+
+//		Preprocessing_lastfm pr = new Preprocessing_lastfm();
+//		ALGControl.initData4LastFM(pr);
+//		pr.buildUserList(Dbconnection._getConn().getResultSet(
+//				GlobalSQLQuery.GETUSER));
 
 		// Read norm matrix from file outside
 		ALGControl.readMatrix();
@@ -233,8 +232,8 @@ public class ALGControl extends Thread {
 //		 alg.start();
 
 		// Running LinUCB-Kmean
-		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
-		alg.start();
+//		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
+//		alg.start();
 
 		// Run LinUCBTREE
 		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
@@ -242,8 +241,8 @@ public class ALGControl extends Thread {
 		// double bigRW = Double.NEGATIVE_INFINITY, trueAlphaICML = 0;
 		// for (double k = 0.03; k < 1; k += 0.03) {
 		// Environment.alphaICML = k;
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
-		// alg.start();
+		 alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
+		 alg.start();
 		// if (alg.getRewardTotal() > bigRW) {
 		// bigRW = alg.getRewardTotal();
 		// trueAlphaICML = k;

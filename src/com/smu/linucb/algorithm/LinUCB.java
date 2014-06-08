@@ -26,14 +26,18 @@ class IndItem {
 	private SimpleMatrix bOld = null;
 	private SimpleMatrix theta = null;
 	private SimpleMatrix thetaOld = null;
+	private Set<Integer> connectedUserSet = null;
+	public int order;
 
 	public IndItem() {
 		M = SimpleMatrix.identity(Environment.featureSize);
 		b = new SimpleMatrix(Environment.featureSize, 1);
 		setMOld(SimpleMatrix.identity(Environment.featureSize));
 		setbOld(new SimpleMatrix(Environment.featureSize, 1));
-		setTheta(new SimpleMatrix(Environment.featureSize, 1));
-		setThetaOld(new SimpleMatrix(Environment.featureSize, 1));
+		theta = M.invert().mult(b);
+		thetaOld = M.invert().mult(b); 
+//		setTheta(new SimpleMatrix(Environment.featureSize, 1));
+//		setThetaOld(new SimpleMatrix(Environment.featureSize, 1));
 	}
 
 	public SimpleMatrix getM() {
@@ -98,6 +102,14 @@ class IndItem {
 
 	public void setThetaOld(SimpleMatrix thetaOld) {
 		this.thetaOld = thetaOld;
+	}
+
+	public Set<Integer> getConnectedUserSet() {
+		return connectedUserSet;
+	}
+
+	public void setConnectedUserSet(Set<Integer> connectedUserSet) {
+		this.connectedUserSet = connectedUserSet;
 	}
 }
 

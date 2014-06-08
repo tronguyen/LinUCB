@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
@@ -15,6 +16,7 @@ import org.ejml.simple.SimpleMatrix;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
+import com.smu.linucb.global.GlobalSQLQuery;
 
 public class CLUB extends LinUCB {
 	private double rewardTotal = 0;
@@ -26,24 +28,58 @@ public class CLUB extends LinUCB {
 	private Set<Integer> clusterUser = new HashSet<Integer>();
 	private EuclideanDistance edd = new EuclideanDistance();
 	private LinUCB linucb4ICML = new LinUCB(1);
+	private Set<Integer> visitedSet = new HashSet<Integer>();
+	private static int userLstSize;
+	private Random genGraph;
+	private String fileAdd;
 
-	static {
-		IndItem u = null;
-		for (int i = 0; i < Environment.userLst.size(); i++) {
-			for (int j = 0; j < Environment.userLst.size(); j++) {
-				userGraph[i][j] = (i == j) ? 0 : 1;
+//	static {
+//		IndItem u = null;
+//		userLstSize = Environment.userLst.size();
+//		// double pValue = 3 * Math.log(userLstSize) / userLstSize;
+//		for (int i = 0; i < userLstSize; i++) {
+//			for (int j = i; j < userLstSize; j++) {
+//				// userGraph[j][i] = userGraph[i][j] = (i != j && ((new
+//				// Random())
+//				// .nextDouble() < pValue)) ? 1 : 0;
+//				userGraph[i][j] = (i == j) ? 0 : 1;
+//			}
+//			u = new IndItem();
+//			userItemMap.put(Environment.userLst.get(i), u);
+//		}
+//
+//	}
+
+	public CLUB() {
+		this.setAlgType(AlgorithmType.CLUB);
+		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType()
+				+ Environment.RUNNINGTIME;
+		userLstSize = Environment.userLst.size();
+		if (Environment.readMode) {
+			userGraph = GlobalFunction.readInGraph(new File(fileAdd
+					+ "_GRAPHFILE"), userLstSize);
+		} else {
+			double pValue = 3 * Math.log(userLstSize) / userLstSize;
+			for (int i = 0; i < userLstSize; i++) {
+				for (int j = i; j < userLstSize; j++) {
+					userGraph[j][i] = userGraph[i][j] = (i != j && ((new Random())
+							.nextDouble() < pValue)) ? 1 : 0;
+				}
 			}
+			GlobalFunction.writeOutGraph(new File(fileAdd + "_GRAPHFILE"),
+					userGraph, userLstSize);
+		}
+
+		// Init user items
+		IndItem u = null;
+		for (int i = 0; i < userLstSize; i++) {
 			u = new IndItem();
 			userItemMap.put(Environment.userLst.get(i), u);
 		}
 	}
 
-	public CLUB() {
-		this.setAlgType(AlgorithmType.CLUB);
-	}
-
 	private void retrieveConnectedUsers(int usrOrder) {
-		for (int i = 0; i < Environment.userLst.size(); i++) {
+		for (int i = 0; i < userLstSize; i++) {
 			if (userGraph[usrOrder][i] == 1
 					&& !this.walkedOrderUserSet.contains(i)) {
 				this.clusterUser.add(Environment.userLst.get(i));
@@ -59,7 +95,7 @@ public class CLUB extends LinUCB {
 		IndItem negItem = null;
 		SimpleMatrix usrWeight = usrItem.getM().invert().mult(usrItem.getB()), negWeight;
 		double userCB = calConfidenceBound(this.userFrequency.get(usr) - 1), negCB;
-		for (int i = 0; i < Environment.userLst.size(); i++) {
+		for (int i = 0; i < userLstSize; i++) {
 			if (userGraph[usrOrder][i] == 1) {
 				neg = Environment.userLst.get(i);
 				negItem = this.userItemMap.get(neg);
@@ -90,14 +126,16 @@ public class CLUB extends LinUCB {
 	public void run() {
 		int usr;
 		int usrOrder;
+		// Write graph to file
+
 		// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 		// TODO Auto-generated method stub
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					outputFile + this.getAlgType())));
+					fileAdd + " [" + Environment.alphaICML + "]")));
 			for (int i = 1; i <= Environment.limitTime; i++) {
 				// Pick user randomly
-				usrOrder = rUSR.nextInt(Environment.userLst.size());
+				usrOrder = rUSR.nextInt(userLstSize);
 				usr = Environment.userLst.get(usrOrder);
 				if (this.userFrequency.containsKey(usr)) {
 					this.userFrequency
@@ -131,6 +169,26 @@ public class CLUB extends LinUCB {
 				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 				if ((i % Environment.buffSizeDisplay) == 0) {
 					bw.write(i + "\t" + this.rewardTotal + "\n");
+					bw.flush();
+				}
+			}
+			bw.flush();
+			bw.close();
+			bw = new BufferedWriter(new FileWriter(new File(fileAdd + " ["
+					+ Environment.alphaICML + "]" + "_TRACKING")));
+
+			for (int i = 0; i < userLstSize; i++) {
+				if (!visitedSet.contains(Environment.userLst.get(i))) {
+					this.walkedOrderUserSet.add(i);
+					this.clusterUser.add(Environment.userLst.get(i));
+					retrieveConnectedUsers(i);
+					visitedSet.addAll(this.clusterUser);
+
+					bw.write(this.clusterUser + "\n");
+					bw.flush();
+
+					this.walkedOrderUserSet.clear();
+					this.clusterUser.clear();
 				}
 			}
 			bw.flush();

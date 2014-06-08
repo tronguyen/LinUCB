@@ -11,16 +11,19 @@ import java.util.Random;
 
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalSQLQuery;
 
 public class LinUCB_IND extends LinUCB {
 
 	private static Map<Integer, LinUCB_IND_impl> banditLst = new HashMap<Integer, LinUCB_IND_impl>();
 	private double rewardTotal = 0;
+	private String fileAdd;
 
 	// public static int time = 0;
 
 	public LinUCB_IND() {
 		this.setAlgType(AlgorithmType.LINUCB_IND);
+		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType();
 	}
 
 	private static LinUCB_IND_impl getUserBandit(int usr) {
@@ -44,7 +47,7 @@ public class LinUCB_IND extends LinUCB {
 		LinUCB_IND_impl r;
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					outputFile + this.getAlgType())));
+					fileAdd)));
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_IND);
 			for (int i = 1; i <= Environment.limitTime; i++) {
 				// Pick user randomly

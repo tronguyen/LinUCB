@@ -18,6 +18,7 @@ import org.ejml.simple.SimpleMatrix;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
+import com.smu.linucb.global.GlobalSQLQuery;
 
 public class LinUCB_KMEAN extends LinUCB {
 
@@ -30,6 +31,7 @@ public class LinUCB_KMEAN extends LinUCB {
 	private Random rClus = new Random(System.nanoTime()
 			* Thread.currentThread().getId());
 	private EuclideanDistance edd = new EuclideanDistance();
+	private String fileAdd = GlobalSQLQuery.outputFile + this.getAlgType();
 
 	public LinUCB_KMEAN() {
 		this.setAlgType(AlgorithmType.LINUCB_KMEAN);
@@ -42,7 +44,7 @@ public class LinUCB_KMEAN extends LinUCB {
 		IndItem u = null;
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					outputFile + this.getAlgType())));
+					fileAdd)));
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 			// TODO Auto-generated method stub
 			for (int i = 1; i <= Environment.limitTime; i++) {
@@ -126,7 +128,7 @@ public class LinUCB_KMEAN extends LinUCB {
 		// Change membership
 		int oldIdx = this.userItemMap.get(usr).getClusterIndex();
 		GlobalFunction.delValueMap(this.clusterItemLstMap, oldIdx, usr);
-		
+
 		// Update link to new cluster
 		this.userItemMap.get(usr).setClusterIndex(clusterIdx);
 		GlobalFunction.addValueMapSet(this.clusterItemLstMap, clusterIdx, usr);

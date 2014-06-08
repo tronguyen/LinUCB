@@ -9,6 +9,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
@@ -16,27 +17,29 @@ import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
 
-class X{
+class X {
 	private int a;
-	public X(){
+
+	public X() {
 		a = 1;
 	}
-	
-	protected void sum(int usr){
+
+	protected void sum(int usr) {
 		a = a + usr;
 		System.out.println("value: " + a);
 	}
 }
 
-public class MiniFunc extends X{
+public class MiniFunc extends X {
 
 	/**
 	 * @param args
 	 */
-	public MiniFunc(int k){
+	public MiniFunc(int k) {
 		super();
 		sum(k);
 	}
+
 	BufferedReader br;
 	BufferedWriter bw;
 	String s = "";
@@ -95,6 +98,9 @@ public class MiniFunc extends X{
 		MiniFunc B = new MiniFunc(2);
 		A.sum(1);
 		B.sum(1);
+		Random r = new Random();
+		for (int i = 0; i < 100; i++)
+			System.out.println(r.nextDouble());
 	}
 
 }

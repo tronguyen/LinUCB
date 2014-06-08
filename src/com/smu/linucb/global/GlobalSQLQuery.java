@@ -22,13 +22,13 @@ public class GlobalSQLQuery {
 			GETSUGGESTION4USER = "SELECT distinct bookmarkID FROM tbl_user_taggedbookmarks where userID = ?";
 			GETUSER = "SELECT distinct userID from tbl_user_taggedbookmarks";
 			fMatrix = new File("Output4Stats/norm_matrix_ejml_full_delicious");
-			outputFile += "Delicious/";
+			outputFile += "Delicious/RandomGraph/";
 			break;
 		case LASTFM:
 			GETSUGGESTION4USER = "SELECT distinct artistID FROM tbl_user_taggedartists where userID = ?";
 			GETUSER = "SELECT distinct userID from tbl_user_artists";
 			fMatrix = new File("Output4Stats/norm_matrix_ejml_full_lastfm");
-			outputFile += "Lastfm/";
+			outputFile += "Lastfm/RandomGraph/";
 			break;
 		}
 	}

@@ -18,6 +18,7 @@ import org.ejml.simple.SimpleMatrix;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalFunction;
+import com.smu.linucb.global.GlobalSQLQuery;
 
 public class LinUCB_KMEAN_MOD extends LinUCB {
 
@@ -30,9 +31,12 @@ public class LinUCB_KMEAN_MOD extends LinUCB {
 	private Random rClus = new Random(System.nanoTime()
 			* Thread.currentThread().getId());
 	private EuclideanDistance edd = new EuclideanDistance();
+	private String fileAdd;
 
 	public LinUCB_KMEAN_MOD() {
 		this.setAlgType(AlgorithmType.LINUCB_KMEAN);
+		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType() + "_MOD_"
+				+ Environment.numCluster;
 	}
 
 	@Override
@@ -42,7 +46,7 @@ public class LinUCB_KMEAN_MOD extends LinUCB {
 		IndItem u = null;
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					outputFile + this.getAlgType() + "_" + Environment.numCluster)));
+					fileAdd)));
 			// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 			// TODO Auto-generated method stub
 			for (int i = 1; i <= Environment.limitTime; i++) {
@@ -94,7 +98,17 @@ public class LinUCB_KMEAN_MOD extends LinUCB {
 				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 				if ((i % Environment.buffSizeDisplay) == 0) {
 					bw.write(i + "\t" + this.rewardTotal + "\n");
+					bw.flush();
 				}
+			}
+			bw.flush();
+			bw.close();
+
+			bw = new BufferedWriter(new FileWriter(new File(fileAdd
+					+ "_TRACKING")));
+			for (int k : this.clusterItemLstMap.keySet()) {
+				bw.write(this.clusterItemLstMap.get(k) + "\n");
+				bw.flush();
 			}
 			bw.flush();
 			bw.close();

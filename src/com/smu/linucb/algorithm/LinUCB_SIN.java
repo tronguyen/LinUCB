@@ -7,15 +7,18 @@ import java.io.IOException;
 
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalSQLQuery;
 
 public class LinUCB_SIN extends LinUCB {
 
 	// public static int time = 0;
 	private double rewardTotal = 0;
+	private String fileAdd;
 
 	public LinUCB_SIN() {
 		// TODO Auto-generated constructor stub
 		this.setAlgType(AlgorithmType.LINUCB_SIN);
+		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType();
 	}
 
 	@Override
@@ -24,7 +27,7 @@ public class LinUCB_SIN extends LinUCB {
 		// TODO Auto-generated method stub
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(
-					outputFile + this.getAlgType())));
+					fileAdd)));
 
 			for (int i = 1; i <= Environment.limitTime; i++) {
 				// Pick user randomly
