@@ -202,17 +202,17 @@ public class ALGControl extends Thread {
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
 
-		Preprocessing pr = new Preprocessing();
-		// Init data for PCA
-		ALGControl.initData4Delicious(pr);
-		// Get users from db
-		pr.buildUserList(Dbconnection._getConn().getResultSet(
-				GlobalSQLQuery.GETUSER));
-
-//		Preprocessing_lastfm pr = new Preprocessing_lastfm();
-//		ALGControl.initData4LastFM(pr);
+//		Preprocessing pr = new Preprocessing();
+//		// Init data for PCA
+//		ALGControl.initData4Delicious(pr);
+//		// Get users from db
 //		pr.buildUserList(Dbconnection._getConn().getResultSet(
 //				GlobalSQLQuery.GETUSER));
+
+		Preprocessing_lastfm pr = new Preprocessing_lastfm();
+		ALGControl.initData4LastFM(pr);
+		pr.buildUserList(Dbconnection._getConn().getResultSet(
+				GlobalSQLQuery.GETUSER));
 
 		// Read norm matrix from file outside
 		ALGControl.readMatrix();

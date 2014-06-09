@@ -249,10 +249,10 @@ public class LinUCB extends AlgorithmThreadBuilder {
 					max = p.getMatrix().get(k);
 				}
 			}
-			System.out.println("---BM list: "
-					+ Arrays.toString(this.bmLst.toArray()));
-			System.out.println("---Suggestion: " + resBM);
-			System.out.println("---True BM: " + selectedBM);
+//			System.out.println("---BM list: "
+//					+ Arrays.toString(this.bmLst.toArray()));
+//			System.out.println("---Suggestion: " + resBM);
+//			System.out.println("---True BM: " + selectedBM);
 			/*
 			 * Compare with user's choice = 1: for right one = -1: for wrong one
 			 */

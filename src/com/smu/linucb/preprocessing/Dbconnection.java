@@ -26,7 +26,7 @@ public class Dbconnection {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/delicious", "root", "");
+					"jdbc:mysql://localhost:3306/lastfm", "root", "");
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

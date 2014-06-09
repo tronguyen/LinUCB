@@ -38,8 +38,8 @@ public class Environment {
 	// HashMap<Integer, List<Integer>>();
 
 	// Configure for LinUCB TREE
-	public static int numCluster = 16;
-	public static int numBranch = 16;
+	public static int numCluster = 1;
+	public static int numBranch = 1;
 
 	// Configure for warm-start
 	public static int numWarmIter = 2000;
@@ -71,7 +71,8 @@ public class Environment {
 
 	public static String RW2FILE_WARM = "Output4Stats/RW2File_WARM/";
 	public static String RW2FILE_VER = "Output4Stats/RW2File_VER/";
-	public static DATASET DATASOURCE = DATASET.DELICIOUS;
-	public static String RUNNINGTIME = "_TIME_2";
+	public static DATASET DATASOURCE = DATASET.LASTFM;
+	public static String RUNNINGTIME = "_TIME_8";
 	public static boolean readMode = true;
+	public static boolean randomGraph = true;
 }

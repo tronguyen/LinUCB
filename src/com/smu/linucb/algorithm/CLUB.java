@@ -20,61 +20,71 @@ import com.smu.linucb.global.GlobalSQLQuery;
 
 public class CLUB extends LinUCB {
 	private double rewardTotal = 0;
-	private static int[][] userGraph = new int[Environment.userLst.size()][Environment.userLst
-			.size()];
-	private static Map<Integer, IndItem> userItemMap = new HashMap<Integer, IndItem>();
-	private Map<Integer, Integer> userFrequency = new HashMap<Integer, Integer>();
-	private Set<Integer> walkedOrderUserSet = new HashSet<Integer>();
-	private Set<Integer> clusterUser = new HashSet<Integer>();
-	private EuclideanDistance edd = new EuclideanDistance();
-	private LinUCB linucb4ICML = new LinUCB(1);
-	private Set<Integer> visitedSet = new HashSet<Integer>();
-	private static int userLstSize;
+	private int[][] userGraph;
+	private Map<Integer, IndItem> userItemMap;
+	private Map<Integer, Integer> userFrequency;
+	private Set<Integer> walkedOrderUserSet;
+	private Set<Integer> clusterUser;
+	private EuclideanDistance edd;
+	private LinUCB linucb4ICML;
+	private Set<Integer> visitedSet;
+	private int userLstSize;
 	private Random genGraph;
 	private String fileAdd;
 
-//	static {
-//		IndItem u = null;
-//		userLstSize = Environment.userLst.size();
-//		// double pValue = 3 * Math.log(userLstSize) / userLstSize;
-//		for (int i = 0; i < userLstSize; i++) {
-//			for (int j = i; j < userLstSize; j++) {
-//				// userGraph[j][i] = userGraph[i][j] = (i != j && ((new
-//				// Random())
-//				// .nextDouble() < pValue)) ? 1 : 0;
-//				userGraph[i][j] = (i == j) ? 0 : 1;
-//			}
-//			u = new IndItem();
-//			userItemMap.put(Environment.userLst.get(i), u);
-//		}
-//
-//	}
+	private void init() {
+		userGraph = new int[Environment.userLst.size()][Environment.userLst
+				.size()];
+		userItemMap = new HashMap<Integer, IndItem>();
+		userFrequency = new HashMap<Integer, Integer>();
+		walkedOrderUserSet = new HashSet<Integer>();
+		clusterUser = new HashSet<Integer>();
+		edd = new EuclideanDistance();
+		linucb4ICML = new LinUCB(1);
+		visitedSet = new HashSet<Integer>();
 
-	public CLUB() {
 		this.setAlgType(AlgorithmType.CLUB);
 		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType()
 				+ Environment.RUNNINGTIME;
 		userLstSize = Environment.userLst.size();
-		if (Environment.readMode) {
-			userGraph = GlobalFunction.readInGraph(new File(fileAdd
-					+ "_GRAPHFILE"), userLstSize);
-		} else {
-			double pValue = 3 * Math.log(userLstSize) / userLstSize;
-			for (int i = 0; i < userLstSize; i++) {
-				for (int j = i; j < userLstSize; j++) {
-					userGraph[j][i] = userGraph[i][j] = (i != j && ((new Random())
-							.nextDouble() < pValue)) ? 1 : 0;
-				}
-			}
-			GlobalFunction.writeOutGraph(new File(fileAdd + "_GRAPHFILE"),
-					userGraph, userLstSize);
-		}
+	}
 
-		// Init user items
-		IndItem u = null;
-		for (int i = 0; i < userLstSize; i++) {
-			u = new IndItem();
-			userItemMap.put(Environment.userLst.get(i), u);
+	public CLUB() {
+		init();
+		if (Environment.randomGraph) {
+			if (Environment.readMode) {
+				// Read the graph from file
+				userGraph = GlobalFunction.readInGraph(new File(fileAdd
+						+ "_GRAPHFILE"), userLstSize);
+			} else {
+				double pValue = 3 * Math.log(userLstSize) / userLstSize;
+				for (int i = 0; i < userLstSize; i++) {
+					for (int j = i; j < userLstSize; j++) {
+						userGraph[j][i] = userGraph[i][j] = (i != j && ((new Random())
+								.nextDouble() < pValue)) ? 1 : 0;
+					}
+				}
+				// Write graph to file
+				GlobalFunction.writeOutGraph(new File(fileAdd + "_GRAPHFILE"),
+						userGraph, userLstSize);
+			}
+
+			// Init user items
+			IndItem u = null;
+			for (int i = 0; i < userLstSize; i++) {
+				u = new IndItem();
+				userItemMap.put(Environment.userLst.get(i), u);
+			}
+		} else {
+			IndItem u = null;
+			userLstSize = Environment.userLst.size();
+			for (int i = 0; i < userLstSize; i++) {
+				for (int j = 0; j < userLstSize; j++) {
+					userGraph[i][j] = (i == j) ? 0 : 1;
+				}
+				u = new IndItem();
+				userItemMap.put(Environment.userLst.get(i), u);
+			}
 		}
 	}
 
@@ -126,8 +136,6 @@ public class CLUB extends LinUCB {
 	public void run() {
 		int usr;
 		int usrOrder;
-		// Write graph to file
-
 		// Environment.drChart.genDiffConfig(AlgorithmType.LINUCB_SIN);
 		// TODO Auto-generated method stub
 		try {
