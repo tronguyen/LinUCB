@@ -91,7 +91,7 @@ public class ALGControl extends Thread {
 		}
 	}
 
-	public static void initData4LastFM(Preprocessing_lastfm pr) {
+	public static void initData4LastFM(Preprocessing pr) {
 		Dbconnection dbconn = Dbconnection._getConn();
 		try {
 			// Build tag set for counting
@@ -201,18 +201,23 @@ public class ALGControl extends Thread {
 
 	public static void main(String[] args) throws SQLException {
 		// TODO Auto-generated method stub
-
-//		Preprocessing pr = new Preprocessing();
-//		// Init data for PCA
-//		ALGControl.initData4Delicious(pr);
-//		// Get users from db
-//		pr.buildUserList(Dbconnection._getConn().getResultSet(
-//				GlobalSQLQuery.GETUSER));
-
-		Preprocessing_lastfm pr = new Preprocessing_lastfm();
-		ALGControl.initData4LastFM(pr);
-		pr.buildUserList(Dbconnection._getConn().getResultSet(
-				GlobalSQLQuery.GETUSER));
+		Preprocessing pr;
+		switch (Environment.DATASOURCE) {
+		case DELICIOUS:
+			pr = new Preprocessing();
+			// Init data for PCA
+			ALGControl.initData4Delicious(pr);
+			// Get users from db
+			pr.buildUserList(Dbconnection._getConn().getResultSet(
+					GlobalSQLQuery.GETUSER));
+			break;
+		case LASTFM:
+			pr = new Preprocessing_lastfm();
+			ALGControl.initData4LastFM(pr);
+			pr.buildUserList(Dbconnection._getConn().getResultSet(
+					GlobalSQLQuery.GETUSER));
+			break;
+		}
 
 		// Read norm matrix from file outside
 		ALGControl.readMatrix();
@@ -224,32 +229,24 @@ public class ALGControl extends Thread {
 
 		ALGControl alg;
 		// Running LinSIN
-//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
-//		 alg.start();
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
+		// alg.start();
 
 		// Running LinIND
-//		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
-//		 alg.start();
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
+		// alg.start();
 
 		// Running LinUCB-Kmean
-//		alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
-//		alg.start();
+		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
+		 alg.start();
 
 		// Run LinUCBTREE
 		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
 		// alg.start();
-		// double bigRW = Double.NEGATIVE_INFINITY, trueAlphaICML = 0;
-		// for (double k = 0.03; k < 1; k += 0.03) {
-		// Environment.alphaICML = k;
-		 alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
-		 alg.start();
-		// if (alg.getRewardTotal() > bigRW) {
-		// bigRW = alg.getRewardTotal();
-		// trueAlphaICML = k;
-		// }
-		// System.out.println("RW: " + bigRW + " --- k: " + k);
-		// }
-		// System.out.println("True Value: " + trueAlphaICML);
+
+		// Run CLUB
+		// alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
+		// alg.start();
 
 		// Running verification && Warmstart
 		// TreeFixedCluster.doCluster();

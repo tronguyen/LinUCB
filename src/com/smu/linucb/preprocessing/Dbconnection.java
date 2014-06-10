@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.smu.linucb.global.DATASET;
 import com.smu.linucb.global.Environment;
 
 public class Dbconnection {
@@ -24,9 +25,11 @@ public class Dbconnection {
 
 	private Dbconnection() {
 		try {
+			String dataset = (Environment.DATASOURCE.equals(DATASET.LASTFM)) ? "lastfm"
+					: "delicious";
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/lastfm", "root", "");
+					"jdbc:mysql://localhost:3306/" + dataset, "root", "");
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

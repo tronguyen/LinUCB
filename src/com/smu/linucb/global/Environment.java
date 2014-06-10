@@ -9,10 +9,7 @@ import java.util.Set;
 
 import com.smu.alg.view.DrawChart;
 
-enum DATASET{
-	DELICIOUS,
-	LASTFM
-}
+
 public class Environment {
 	// Delicious
 	public static Map<String, Double> hm_token_weight = new HashMap<String, Double>();
@@ -38,8 +35,8 @@ public class Environment {
 	// HashMap<Integer, List<Integer>>();
 
 	// Configure for LinUCB TREE
-	public static int numCluster = 1;
-	public static int numBranch = 1;
+	public static int numCluster = 2;
+	public static int numBranch = 2;
 
 	// Configure for warm-start
 	public static int numWarmIter = 2000;
@@ -50,7 +47,7 @@ public class Environment {
 	public static double delta = 0.05;
 	public static double alphaLin = 1 + Math.sqrt(Math.log(2 / delta) / 2);
 	public static double alphaUCB = Math.pow(10, -1); // Fixed 0.1 for best
-	public static double alphaICML = 0.7; //Math.pow(10, 0);
+	public static double alphaICML = 0.4; //Math.pow(10, 0);
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 50000;
@@ -72,7 +69,7 @@ public class Environment {
 	public static String RW2FILE_WARM = "Output4Stats/RW2File_WARM/";
 	public static String RW2FILE_VER = "Output4Stats/RW2File_VER/";
 	public static DATASET DATASOURCE = DATASET.LASTFM;
-	public static String RUNNINGTIME = "_TIME_8";
+	public static String RUNNINGTIME = "_TIME_7";
 	public static boolean readMode = true;
-	public static boolean randomGraph = true;
+	public static boolean randomGraph = false;
 }
