@@ -9,7 +9,6 @@ import java.util.Set;
 
 import com.smu.alg.view.DrawChart;
 
-
 public class Environment {
 	// Delicious
 	public static Map<String, Double> hm_token_weight = new HashMap<String, Double>();
@@ -18,13 +17,11 @@ public class Environment {
 	public static Set<String> tagSet = new HashSet<String>();
 	public static List<Integer> userLst = new ArrayList<Integer>();
 	public static Set<Integer> removedBM = new HashSet<Integer>();
-	
+
 	// LastFM
 	public static Map<Integer, Map<String, Double>> hm_artist_tag = new HashMap<Integer, Map<String, Double>>();
 	public static Map<String, Set<Integer>> hm_tag_artistset = new HashMap<String, Set<Integer>>();
-	
-	
-	
+
 	public static Map<Integer, Double[]> normMatrix = new HashMap<Integer, Double[]>();
 	public static DrawChart drChart = new DrawChart("Multi-Bandits Algorithm");
 	public static List<Integer> bmidLst = new ArrayList<Integer>();
@@ -47,7 +44,7 @@ public class Environment {
 	public static double delta = 0.05;
 	public static double alphaLin = 1 + Math.sqrt(Math.log(2 / delta) / 2);
 	public static double alphaUCB = Math.pow(10, -1); // Fixed 0.1 for best
-	public static double alphaICML = 0.4; //Math.pow(10, 0);
+	public static double alphaICML = 0.4; // Math.pow(10, 0);
 	public static double payoffRight = 1;
 	public static double payoffWrong = (double) -1 / 24;
 	public static int limitTime = 50000;
@@ -71,5 +68,6 @@ public class Environment {
 	public static DATASET DATASOURCE = DATASET.LASTFM;
 	public static String RUNNINGTIME = "_TIME_7";
 	public static boolean readMode = true;
-	public static boolean randomGraph = false;
+	public static boolean randomGraph = true;
+	public static AlgorithmType runningAlgType = AlgorithmType.CLUB;
 }

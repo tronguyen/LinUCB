@@ -16,6 +16,7 @@ import com.smu.linucb.pca.PrincipleComponentAnalysis;
 import com.smu.linucb.preprocessing.Dbconnection;
 import com.smu.linucb.preprocessing.Preprocessing;
 import com.smu.linucb.preprocessing.Preprocessing_lastfm;
+import com.smu.linucb.verification.TreeFixedCluster;
 
 public class ALGControl extends Thread {
 
@@ -228,32 +229,43 @@ public class ALGControl extends Thread {
 		Environment.drChart.setVisible(true);
 
 		ALGControl alg;
-		// Running LinSIN
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
-		// alg.start();
-
-		// Running LinIND
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
-		// alg.start();
-
-		// Running LinUCB-Kmean
-		 alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
-		 alg.start();
-
-		// Run LinUCBTREE
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
-		// alg.start();
-
-		// Run CLUB
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
-		// alg.start();
-
-		// Running verification && Warmstart
-		// TreeFixedCluster.doCluster();
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
-		// alg.start();
-
-		// alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
-		// alg.start();
+		switch (Environment.runningAlgType) {
+		case LINUCB_SIN:
+			// Running LinSIN
+			alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_SIN);
+			alg.start();
+			break;
+		case LINUCB_IND:
+			// Running LinIND
+			alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_IND);
+			alg.start();
+			break;
+		case LINUCB_KMEAN:
+			// Running LinUCB-Kmean
+			alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_KMEAN);
+			alg.start();
+			break;
+		case LINUCB_TREE:
+			// Run LinUCBTREE
+			alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_TREE);
+			alg.start();
+			break;
+		case CLUB:
+			// Run CLUB
+			alg = new AlgorithmThreadBuilder(AlgorithmType.CLUB);
+			alg.start();
+			break;
+		case LINUCB_VER:
+			// Running verification && Warmstart
+			TreeFixedCluster.doCluster();
+			alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_VER);
+			alg.start();
+			break;
+		case LINUCB_WARM:
+			TreeFixedCluster.doCluster();
+			alg = new AlgorithmThreadBuilder(AlgorithmType.LINUCB_WARM);
+			alg.start();
+			break;
+		}
 	}
 }
