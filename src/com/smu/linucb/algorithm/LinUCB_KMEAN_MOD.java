@@ -23,20 +23,31 @@ import com.smu.linucb.global.GlobalSQLQuery;
 public class LinUCB_KMEAN_MOD extends LinUCB {
 
 	private double rewardTotal = 0;
-	private List<Integer> fstTimeUsrLst = new ArrayList<Integer>();
-	private List<UCB1> clusterLst = new ArrayList<UCB1>();
-	private Map<Integer, IndItem> userItemMap = new HashMap<Integer, IndItem>();
-	private Map<Integer, Set<Integer>> clusterItemLstMap = new HashMap<Integer, Set<Integer>>();
+	private List<Integer> fstTimeUsrLst;
+	private List<UCB1> clusterLst;
+	private Map<Integer, IndItem> userItemMap;
+	private Map<Integer, Set<Integer>> clusterItemLstMap;
 	int initClusCount = 0;
-	private Random rClus = new Random(System.nanoTime()
-			* Thread.currentThread().getId());
-	private EuclideanDistance edd = new EuclideanDistance();
+	private Random rClus;
+
+	private EuclideanDistance edd;
 	private String fileAdd;
 
 	public LinUCB_KMEAN_MOD() {
+		init();
 		this.setAlgType(AlgorithmType.LINUCB_KMEAN);
-		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType() + "_MOD_"
-				+ Environment.numCluster;
+		fileAdd = fileAddCommon + this.getAlgType()
+				+ "_MOD_" + Environment.numCluster;
+	}
+
+	public void init() {
+		fstTimeUsrLst = new ArrayList<Integer>();
+		clusterLst = new ArrayList<UCB1>();
+		userItemMap = new HashMap<Integer, IndItem>();
+		clusterItemLstMap = new HashMap<Integer, Set<Integer>>();
+		initClusCount = 0;
+		rClus = new Random(System.nanoTime() * Thread.currentThread().getId());
+		edd = new EuclideanDistance();
 	}
 
 	@Override
@@ -95,8 +106,10 @@ public class LinUCB_KMEAN_MOD extends LinUCB {
 				}
 				// Draw chart
 				// this.displayResult(i, LinUCB_KMEAN.rewardTotal);
-				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+				// this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 				if ((i % Environment.buffSizeDisplay) == 0) {
+					// Draw chart
+					this.displayResult(i, this.rewardTotal, this.getDrChart());
 					bw.write(i + "\t" + this.rewardTotal + "\n");
 					bw.flush();
 				}

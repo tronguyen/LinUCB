@@ -44,7 +44,7 @@ public class CLUB extends LinUCB {
 		visitedSet = new HashSet<Integer>();
 
 		this.setAlgType(AlgorithmType.CLUB);
-		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType()
+		fileAdd = fileAddCommon + this.getAlgType()
 				+ Environment.RUNNINGTIME;
 		userLstSize = Environment.userLst.size();
 	}
@@ -174,8 +174,10 @@ public class CLUB extends LinUCB {
 				this.clusterUser.clear();
 				// Draw chart
 				// this.displayResult(i, LinUCB_KMEAN.rewardTotal);
-				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+				// this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 				if ((i % Environment.buffSizeDisplay) == 0) {
+					// Draw chart
+					this.displayResult(i, this.rewardTotal, this.getDrChart());
 					bw.write(i + "\t" + this.rewardTotal + "\n");
 					bw.flush();
 				}

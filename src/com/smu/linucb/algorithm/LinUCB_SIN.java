@@ -13,12 +13,11 @@ public class LinUCB_SIN extends LinUCB {
 
 	// public static int time = 0;
 	private double rewardTotal = 0;
-	private String fileAdd;
 
 	public LinUCB_SIN() {
 		// TODO Auto-generated constructor stub
 		this.setAlgType(AlgorithmType.LINUCB_SIN);
-		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType();
+		fileAdd = fileAddCommon + this.getAlgType();
 	}
 
 	@Override
@@ -37,11 +36,14 @@ public class LinUCB_SIN extends LinUCB {
 				this.impl();
 				this.reset();
 				this.rewardTotal += this.getPayoff();
-				// Draw chart
-				// this.displayResult(i, LinUCB_SIN.rewardTotal);
-				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+
+				// this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 				if ((i % Environment.buffSizeDisplay) == 0) {
+					// Draw chart
+					this.displayResult(i, this.rewardTotal, this.getDrChart());
+
 					bw.write(i + "\t" + this.rewardTotal + "\n");
+					bw.flush();
 				}
 			}
 			bw.flush();

@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.jfree.ui.RefineryUtilities;
+
+import com.smu.alg.view.DrawChart;
 import com.smu.linucb.algorithm.CLUB;
 import com.smu.linucb.algorithm.LinUCB_IND;
 import com.smu.linucb.algorithm.LinUCB_KMEAN_MOD;
@@ -13,6 +16,8 @@ import com.smu.linucb.algorithm.LinUCB_SIN;
 import com.smu.linucb.algorithm.LinUCB_TREE;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
+import com.smu.linucb.global.GlobalFunction;
+import com.smu.linucb.global.GlobalSQLQuery;
 import com.smu.linucb.verification.TreeFixedCluster;
 
 class RewardUpdate {
@@ -44,6 +49,7 @@ public class AlgorithmThreadBuilder extends ALGControl {
 	private Map<Integer, RewardUpdate> rewardMonitor;
 	private List<Integer> rewardIndex;
 	protected AlgorithmThreadBuilder inClass;
+	private DrawChart drChart;
 
 	public AlgorithmThreadBuilder() {
 		this.rUSR = new Random(System.nanoTime()
@@ -69,12 +75,10 @@ public class AlgorithmThreadBuilder extends ALGControl {
 		this.algType = algType;
 	}
 
-	public synchronized void displayResult(int count, double reward) {
+	public synchronized void displayResult(int count, double reward,
+			DrawChart chart) {
 		// TODO Auto-generated method stub
-
-		// System.out.println("\n\nRound: " + count);
-		// System.out.println("=========" + reward + "============\n\n");
-		Environment.drChart.addData(this.algType, count, reward);
+		chart.addData(this.algType, count, reward);
 	}
 
 	public static AlgorithmThreadBuilder factoryInstanceAlg(AlgorithmType type) {
@@ -115,39 +119,49 @@ public class AlgorithmThreadBuilder extends ALGControl {
 	@Override
 	public void run() {
 		AlgorithmThreadBuilder alg;
-		Environment.drChart.genDiffConfig(this.algType);
-		for (int k = 0; k < Environment.numAvgLoop; k++) {
+
+		for (int k = 1; k <= Environment.numAvgLoop; k++) {
+			fileAddCommon = GlobalSQLQuery.outputFile + "TRY" + k + "/";
+			// Plot graph
+			setDrChart(new DrawChart("Multi-Bandits Algorithm"));
+			getDrChart().pack();
+			RefineryUtilities.centerFrameOnScreen(getDrChart());
+			getDrChart().setVisible(true);
+			getDrChart().genDiffConfig(this.algType);
+
 			alg = AlgorithmThreadBuilder.factoryInstanceAlg(this.algType);
-			alg.setInClass(this);
+			// alg.setInClass(this);
+			alg.setDrChart(drChart);
 			alg.start();
 		}
-		int time;
-		double rewardDisplay = 0;
-		while (true) {
-			if (this.getRewardIndex().size() != 0) {
-				time = this.getRewardIndex().get(0);
-				if (this.getRewardMonitor().get(time).getCount() == Environment.numAvgLoop) {
-					rewardDisplay = this.getRewardMonitor().get(time)
-							.getReward()
-							/ Environment.numAvgLoop;
-					this.displayResult(time, rewardDisplay);
-//					System.out.println("Time: " + time + " Reward: "
-//							+ rewardDisplay);
-				}
-				this.getRewardIndex().remove(0);
-				if (time == Environment.limitTime) {
-					System.out.println("Reward: " + rewardDisplay);
-					this.interrupt();
-					return;
-				}
-			}
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		// int time;
+		// double rewardDisplay = 0;
+		// while (true) {
+		// if (this.getRewardIndex().size() != 0) {
+		// time = this.getRewardIndex().get(0);
+		// if (this.getRewardMonitor().get(time).getCount() ==
+		// Environment.numAvgLoop) {
+		// rewardDisplay = this.getRewardMonitor().get(time)
+		// .getReward()
+		// / Environment.numAvgLoop;
+		// this.displayResult(time, rewardDisplay);
+		// // System.out.println("Time: " + time + " Reward: "
+		// // + rewardDisplay);
+		// }
+		// this.getRewardIndex().remove(0);
+		// if (time == Environment.limitTime) {
+		// System.out.println("Reward: " + rewardDisplay);
+		// this.interrupt();
+		// return;
+		// }
+		// }
+		// try {
+		// Thread.sleep(1);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// }
 	}
 
 	protected synchronized void updateRewardMap(AlgorithmThreadBuilder rwMap,
@@ -195,5 +209,13 @@ public class AlgorithmThreadBuilder extends ALGControl {
 
 	protected synchronized void setRewardIndex(List<Integer> rewardIndex) {
 		this.rewardIndex = rewardIndex;
+	}
+
+	protected DrawChart getDrChart() {
+		return drChart;
+	}
+
+	protected void setDrChart(DrawChart drChart) {
+		this.drChart = drChart;
 	}
 }

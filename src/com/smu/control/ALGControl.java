@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import org.jfree.ui.RefineryUtilities;
 
+import com.smu.alg.view.DrawChart;
 import com.smu.linucb.global.AlgorithmType;
 import com.smu.linucb.global.Environment;
 import com.smu.linucb.global.GlobalSQLQuery;
@@ -19,6 +20,8 @@ import com.smu.linucb.preprocessing.Preprocessing_lastfm;
 import com.smu.linucb.verification.TreeFixedCluster;
 
 public class ALGControl extends Thread {
+	protected String fileAdd;
+	protected static String fileAddCommon;
 
 	/**
 	 * @param args
@@ -223,12 +226,8 @@ public class ALGControl extends Thread {
 		// Read norm matrix from file outside
 		ALGControl.readMatrix();
 
-		// Plot graph
-		Environment.drChart.pack();
-		RefineryUtilities.centerFrameOnScreen(Environment.drChart);
-		Environment.drChart.setVisible(true);
-
 		ALGControl alg;
+
 		switch (Environment.runningAlgType) {
 		case LINUCB_SIN:
 			// Running LinSIN

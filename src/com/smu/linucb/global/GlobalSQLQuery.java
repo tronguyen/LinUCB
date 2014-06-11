@@ -31,7 +31,8 @@ public class GlobalSQLQuery {
 			outputFile += "Lastfm/";
 			break;
 		}
-		outputFile = (Environment.randomGraph) ? (outputFile + "RandomGraph/")
+		outputFile = (Environment.randomGraph && Environment.runningAlgType
+				.equals(AlgorithmType.CLUB)) ? (outputFile + "RandomGraph/")
 				: outputFile;
 	}
 }

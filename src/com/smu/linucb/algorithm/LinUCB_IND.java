@@ -15,7 +15,7 @@ import com.smu.linucb.global.GlobalSQLQuery;
 
 public class LinUCB_IND extends LinUCB {
 
-	private static Map<Integer, LinUCB_IND_impl> banditLst = new HashMap<Integer, LinUCB_IND_impl>();
+	private Map<Integer, LinUCB_IND_impl> banditLst;
 	private double rewardTotal = 0;
 	private String fileAdd;
 
@@ -23,14 +23,15 @@ public class LinUCB_IND extends LinUCB {
 
 	public LinUCB_IND() {
 		this.setAlgType(AlgorithmType.LINUCB_IND);
-		fileAdd = GlobalSQLQuery.outputFile + this.getAlgType();
+		fileAdd = fileAddCommon + this.getAlgType();
+		banditLst = new HashMap<Integer, LinUCB_IND_impl>();
 	}
 
-	private static LinUCB_IND_impl getUserBandit(int usr) {
-		LinUCB_IND_impl ucb = LinUCB_IND.banditLst.get(usr);
+	private LinUCB_IND_impl getUserBandit(int usr) {
+		LinUCB_IND_impl ucb = this.banditLst.get(usr);
 		if (ucb == null) {
 			ucb = new LinUCB_IND_impl(usr);
-			LinUCB_IND.banditLst.put(usr, ucb);
+			this.banditLst.put(usr, ucb);
 		}
 		return ucb;
 	}
@@ -54,13 +55,15 @@ public class LinUCB_IND extends LinUCB {
 				usr = Environment.userLst.get(rUSR.nextInt(Environment.userLst
 						.size()));
 				// System.out.println("User: " + usr);
-				r = LinUCB_IND.getUserBandit(usr);
+				r = this.getUserBandit(usr);
 				r.run_nonthread();
 				this.rewardTotal += r.getPayoff();
 				// Draw chart
 				// this.displayResult(i, this.rewardTotal);
-				this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
+				// this.updateRewardMap(this.getInClass(), i, this.rewardTotal);
 				if ((i % Environment.buffSizeDisplay) == 0) {
+					// Draw chart
+					this.displayResult(i, this.rewardTotal, this.getDrChart());
 					bw.write(i + "\t" + this.rewardTotal + "\n");
 				}
 			}
